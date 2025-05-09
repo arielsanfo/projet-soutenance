@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/customs/app_constante%5B1%5D.dart';
 import 'package:flutter_application_1/views/sign_view.dart';
 
+import '../customs/app_constante[1].dart';
+
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
 
@@ -13,7 +15,7 @@ class _LoginViewState extends State<LoginView> {
   final _formKey = GlobalKey();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
+  bool _obscurePassword = true; 
 
    @override
   void dispose() {
@@ -26,7 +28,9 @@ class _LoginViewState extends State<LoginView> {
     return Scaffold(
       
       // backgroundColor: Color.lerp(Colors.white, Colors.white, 255),
-      body: SingleChildScrollView(
+      body:Padding(
+padding: AppSpacings.screenPadding,
+    child:    SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.all(25),
           child: Center(
@@ -37,27 +41,24 @@ class _LoginViewState extends State<LoginView> {
                   SizedBox(height: 30),
                   Container(
                     padding: EdgeInsets.all(30),
+                    
                     decoration: BoxDecoration(
+                      borderRadius: AppRadius.defaultRadius
                       color: AppColors.primaryColor,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      Icons.store,
-                      size: 45,
+                      AppIcons.category
+                      size: AppSpacings.xxxxl * 8,
                       color: AppColors.backgroundInput,
                     ),
                   ),
                   SizedBox(height: 40),
                   Text(
                     'CommercePro',
-                    style: TextStyle(
-                      fontFamily: AppTypography.fontFamily,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryLight,
-                      fontSize: 20,
-                    ),
+                    style: AppTypography.titleMedium.apply(color: AppColors.primaryColor),
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(height: AppSpacings.xxxxl),
                   Text(
                     'votre gestion commerciale simplifiee',
                     style: TextStyle(
