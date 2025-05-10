@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/customs/app_constante%5B1%5D.dart';
-import 'package:flutter_application_1/views/login_view.dart';
+import 'package:flutter_application_1/customs/app_constante.dart';
+// import 'package:flutter_application_1/views/login_view.dart';
+import 'package:flutter_application_1/views/profile_view.dart';
 
 class SignView extends StatefulWidget {
   const SignView({super.key});
@@ -10,14 +11,17 @@ class SignView extends StatefulWidget {
 }
 
 class _SignViewState extends State<SignView> {
+  bool _termsAccepted = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Container(
           child: Column(
             children: [
-              SizedBox(height: 30),
+              SizedBox(height: AppSpacings.xxxl),
               Container(
                 decoration: BoxDecoration(),
                 child: Padding(
@@ -25,65 +29,72 @@ class _SignViewState extends State<SignView> {
                   child: Text(
                     textAlign: TextAlign.left,
                     'Creer votre compte',
-                    style: TextStyle(
-                      fontFamily: AppTypography.fontFamily,
-                      fontSize: 30,
-                      color: AppColors.textOnPrimary,
-                    ),
+                    style: AppTypography.displayLarge,
                   ),
                 ),
               ),
               Container(
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  // color: AppColors.primaryDarker
-                ),
+                padding: EdgeInsets.all(AppSpacings.xl),
                 child: Form(
                   child: Column(
                     children: [
                       TextFormField(
                         decoration: InputDecoration(
                           labelText: 'nom complet',
-                          prefixIcon: Icon(Icons.admin_panel_settings),
+
+                          prefixIcon: Icon(
+                            AppIcons.person,
+                            color: AppColors.greyDark,
+                          ),
                         ),
                         keyboardType: TextInputType.text,
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: AppSpacings.xl),
                       TextFormField(
                         decoration: InputDecoration(
                           labelText: 'entrer email',
-                          prefixIcon: Icon(Icons.email),
+                          prefixIcon: Icon(AppIcons.email),
                         ),
                         keyboardType: TextInputType.emailAddress,
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: AppSpacings.xl),
                       TextFormField(
                         decoration: InputDecoration(
                           labelText: 'mot de passe',
-                          prefixIcon: Icon(Icons.password_outlined),
+                          prefixIcon: Icon(AppIcons.password),
                         ),
                         keyboardType: TextInputType.visiblePassword,
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: AppSpacings.xl),
                       TextFormField(
                         decoration: InputDecoration(
                           labelText: 'confirmer votre mot de passe',
-                          prefixIcon: Icon(Icons.confirmation_number),
+                          prefixIcon: Icon(AppIcons.password),
                         ),
                         keyboardType: TextInputType.visiblePassword,
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: AppSpacings.xxxl),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text('j accepte les '),
+                          Checkbox(
+                            value: _termsAccepted,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                _termsAccepted = value ?? false;
+                              });
+                            },
+                          ),
+                          Text('j\' accepte les '),
                           Text(
                             'Termes et Contidions',
-                            style: TextStyle(color: AppColors.primaryColor),
+                            style: AppTypography.bodySmall.apply(
+                              color: AppColors.primaryColor,
+                            ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 70),
+                      SizedBox(height: AppSpacings.xxxxl),
 
                       SizedBox(
                         child: ElevatedButton(
@@ -92,7 +103,7 @@ class _SignViewState extends State<SignView> {
                               context,
                               MaterialPageRoute(
                                 builder:
-                                    (BuildContext context) =>  LoginView(),
+                                    (BuildContext context) => ProfileScreen(),
                               ),
                             );
                             //
@@ -104,14 +115,13 @@ class _SignViewState extends State<SignView> {
                               horizontal: 60,
                             ),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: AppRadius.defaultRadius,
                             ),
                           ),
                           child: Text(
                             ' Creer un compte ',
-                            style: TextStyle(
-                              color: AppColors.textOnPrimary,
-                              fontSize: 20,
+                            style: AppTypography.titleLarge.apply(
+                              color: AppColors.backgroundLight,
                             ),
                           ),
                         ),
