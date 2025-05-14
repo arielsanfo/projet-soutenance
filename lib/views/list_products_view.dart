@@ -1,27 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/customs/app_constante.dart';
-
-class ProductManagementApp extends StatelessWidget {
-  const ProductManagementApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Gestion de Produits',
-      theme: ThemeData(
-        primarySwatch: Colors.purple,
-        appBarTheme: const AppBarTheme(
-          elevation: 0,
-          backgroundColor: AppColors.backgroundWhite,
-          iconTheme: IconThemeData(color: Colors.black),
-          titleTextStyle: AppTypography.titleLarge
-          
-        ),
-      ),
-      home: const ProductListScreen(),
-    );
-  }
-}
+import 'package:flutter_application_1/views/new_salescreen_view.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({super.key});
@@ -44,7 +23,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
       name: "Savon Artisanal Lavande",
       category: "Hygiène",
       stock: 12,
-      price: "4.50/unité",
+      price: "4.50/U",
       initial: "S",
     ),
     Product(
@@ -58,14 +37,14 @@ class _ProductListScreenState extends State<ProductListScreen> {
       name: "Pain Complet",
       category: "Boulangerie",
       stock: 0,
-      price: "3.50€/kg",
+      price: "3.50f/kg",
       initial: "P",
     ),
     Product(
       name: "Eau Minérale 1L",
       category: "Boissons",
       stock: 24,
-      price: "0.80€/unité",
+      price: "0.80f/U",
       initial: "E",
     ),
   ];
@@ -74,37 +53,53 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Liste des Produits'),
+        title:  Text('Liste des Produits'),
         actions: [
           IconButton(
-            icon: const Icon(AppIcons.list),
-            onPressed: () {},
+            icon:  Icon(AppIcons.list),
+            onPressed: () {
+              //
+            },
           ),
         ],
       ),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(AppSpacings.l),
             child: TextField(
               decoration: InputDecoration(
                 hintText: "Rechercher un produit, SKU...",
-                hintStyle: TextStyle(color: Colors.grey[400]),
-                prefixIcon: const Icon(Icons.search),
+                hintStyle: TextStyle(color: AppColors.greyMedium),
+                prefixIcon: Icon(AppIcons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                contentPadding: EdgeInsets.symmetric(vertical: AppSpacings.s),
               ),
             ),
           ),
           SizedBox(
-            height: 50,
+            height: AppSpacings.xxxl * 1.5,
+
             child: Row(
+              // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildTabButton(0, "Tous", _products.length),
-                _buildTabButton(1, "Stock Bas", _products.where((p) => p.stock > 0 && p.stock < 10).length),
-                _buildTabButton(2, "Hors Stock", _products.where((p) => p.stock == 0).length),
+                Flexible(child: _buildTabButton(0, "Tous", _products.length)),
+                Flexible(
+                  child: _buildTabButton(
+                    1,
+                    "Stock Bas",
+                    _products.where((p) => p.stock > 0 && p.stock < 10).length,
+                  ),
+                ),
+                Flexible(
+                  child: _buildTabButton(
+                    2,
+                    "HorsStock",
+                    _products.where((p) => p.stock == 0).length,
+                  ),
+                ),
               ],
             ),
           ),
@@ -120,11 +115,16 @@ class _ProductListScreenState extends State<ProductListScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
-        icon: const Icon(Icons.add),
-        label: const Text('Ajouter un Produit'),
-        backgroundColor: Colors.purple,
-        foregroundColor: Colors.white,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => NewSaleScreen()),
+          );
+        },
+        icon: Icon(AppIcons.add),
+        label: Text('Ajouter un Produit'),
+        backgroundColor: AppColors.primaryColor,
+        foregroundColor: AppColors.backgroundWhite,
       ),
     );
   }
@@ -142,16 +142,18 @@ class _ProductListScreenState extends State<ProductListScreen> {
             Text(
               "$label ($count)",
               style: TextStyle(
-                fontWeight: _selectedTab == index ? FontWeight.bold : FontWeight.normal,
-                color: _selectedTab == index ? Colors.purple : Colors.grey,
+                fontWeight:
+                    _selectedTab == index ? FontWeight.bold : FontWeight.normal,
+                fontSize: AppTypography.fontSizeSmall,
+                color:
+                    _selectedTab == index
+                        ? AppColors.primaryColor
+                        : Colors.grey,
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: AppSpacings.xxs),
             if (_selectedTab == index)
-              Container(
-                height: 3,
-                color: Colors.purple,
-              ),
+              Container(height: AppSpacings.m, color: AppColors.secondaryColor),
           ],
         ),
       ),
@@ -160,61 +162,50 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
   Widget _buildProductCard(Product product) {
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      elevation: 1,
+      margin: EdgeInsets.symmetric(
+        horizontal: AppSpacings.m,
+        vertical: AppSpacings.s,
+      ),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: _getColorForInitial(product.initial),
           child: Text(
             product.initial,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+            style: AppTypography.titleMedium.apply(
+              color: AppColors.textOnPrimary,
             ),
           ),
         ),
-        title: Text(
-          product.name,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-        ),
+        title: Text(product.name, style: AppTypography.titleSmall),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(product.category),
-            const SizedBox(height: 4),
+
             Row(
               children: [
-                Text(
-                  "Stock : ",
-                  style: TextStyle(color: Colors.grey[600]),
-                ),
+                Text("Stock : ", style: TextStyle(color: AppColors.greyDark)),
                 Text(
                   product.stock.toString(),
                   style: TextStyle(
-                    color: product.stock == 0
-                        ? Colors.red
-                        : product.stock < 10
-                            ? Colors.orange
-                            : Colors.green,
-                    fontWeight: FontWeight.bold,
+                    color:
+                        product.stock == 0
+                            ? AppColors.errorColor
+                            : product.stock < 10
+                            ? AppColors.tagOrangeText
+                            : AppColors.tagGreenText,
                   ),
                 ),
-                const Spacer(),
+                Spacer(),
                 Text(
                   "Prix : ${product.price}",
-                  style: TextStyle(
-                    color: Colors.grey[800],
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: AppTypography.titleSmall,
                 ),
               ],
             ),
           ],
         ),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+        trailing: Icon(AppIcons.arrow_forward, size: AppSpacings.xxl),
       ),
     );
   }

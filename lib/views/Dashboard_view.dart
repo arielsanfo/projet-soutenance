@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/customs/app_constante.dart';
 import 'package:flutter_application_1/views/add_product_view.dart';
+import 'package:flutter_application_1/views/history_view.dart';
 import 'package:flutter_application_1/views/list_products_view.dart';
+import 'package:flutter_application_1/views/new_salescreen_view.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -44,12 +46,12 @@ class DashboardScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  '12500.75 fcfa ',
-                  style: AppTypography.titleMedium,
-
+                Text('12500.75 fcfa ', style: AppTypography.titleLarge),
+                Icon(
+                  AppIcons.chart,
+                  color: AppColors.primaryDarker,
+                  size: AppSpacings.xxxxl,
                 ),
-                Icon(AppIcons.chart,color: AppColors.primaryDarker,size: AppSpacings.xxxxl,)
                 // Icon(App, color: Colors.indigo[400], size: 28),
               ],
             ),
@@ -67,7 +69,7 @@ class DashboardScreen extends StatelessWidget {
         'onTap': () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ProductListScreen()),
+            MaterialPageRoute(builder: (context) => NewSaleScreen()),
           );
         },
       },
@@ -77,16 +79,32 @@ class DashboardScreen extends StatelessWidget {
         'onTap': () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddProductScreen()),
+            MaterialPageRoute(builder: (context) => ProductListScreen()),
           );
         },
       },
-      {'icon': AppIcons.receipt, 'label': 'Commandes', 'onTap': () {
-        //
-      }},
-      {'icon': AppIcons.person, 'label': 'Clients', 'onTap': () {
-        //
-      }},
+      {
+        'icon': AppIcons.receipt,
+        'label': 'Commandes',
+        'onTap': () {
+             Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddProductScreen()),
+          );
+          
+        },
+      },
+      {
+        'icon': AppIcons.person,
+        'label': 'Clients',
+        'onTap': () {
+                Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SalesHistoryScreen()),
+          );
+          
+        },
+      },
     ];
 
     return GridView.count(
@@ -146,11 +164,15 @@ class DashboardScreen extends StatelessWidget {
                     color: Colors.red[50],
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(AppIcons.warning, color: AppColors.errorColor, size: AppSpacings.xxxl),
+                  child: const Icon(
+                    AppIcons.warning,
+                    color: AppColors.errorColor,
+                    size: AppSpacings.xxxl,
+                  ),
                 ),
                 title: Text(
                   alert['title'] as String,
-                  style:  AppTypography.titleMedium
+                  style: AppTypography.titleMedium,
                 ),
                 subtitle: Text(
                   alert['detail'] as String,

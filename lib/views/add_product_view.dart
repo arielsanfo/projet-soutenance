@@ -20,9 +20,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Nouveau Produit'), centerTitle: true),
+      appBar: AppBar(title: Text('Nouveau Produit'), centerTitle: true),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacings.xxxl),
+        padding: EdgeInsets.all(AppSpacings.xxxl),
         child: Form(
           key: _formKey,
           child: Column(
@@ -32,10 +32,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nom du produit',
-                  // hintText: 'Ex: T-shirt en coton',
-                ),
+                decoration: const InputDecoration(labelText: 'Nom du produit'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Veuillez saisir un nom';
@@ -48,7 +45,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
               TextFormField(
                 controller: _descriptionController,
                 maxLines: 2,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Description',
                   hintText: 'Décrivez le produit en détail...',
                 ),
@@ -61,7 +58,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     child: TextFormField(
                       controller: _priceController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Prix ',
                         hintText: '0.00',
                         prefixText: 'fcfa ',
@@ -85,12 +82,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
               TextFormField(
                 controller: _categoryController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Catégorie',
                   hintText: 'Ex: Vêtements, Électronique',
                 ),
               ),
-              const SizedBox(height: AppSpacings.xxxl),
+              SizedBox(height: AppSpacings.xxxl),
 
               TextFormField(
                 controller: _skuController,
@@ -130,11 +127,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
     );
   }
 
-  // Widget pour la section d'upload d'image
   Widget _imageSelection() {
     return GestureDetector(
       onTap: () {
-        // Log
+        //
       },
       child: Container(
         height: AppSpacings.xxxxl * 5,

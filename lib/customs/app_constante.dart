@@ -329,8 +329,8 @@ class AppIcons {
   // Clients & Utilisateurs
   static const IconData userShield = Icons.shield_outlined; // Pour rôle admin
   static const IconData calendar = Icons.calendar_today_outlined;
-  static const IconData debt =
-      Icons.money_off_csred_outlined; // ou Icons.request_quote_outlined
+  static const IconData debt =Icons.money_off_csred_outlined; // ou Icons.request_quote_outlined
+  static const IconData refresh =Icons.refresh; // ou Icons.request_quote_outlined
 
   // Divers
   static const IconData notification = Icons.notifications_none_outlined;
@@ -358,6 +358,14 @@ class AppIcons {
   static const IconData warning = Icons.warning; // fas fa-leaf
   static const IconData arrow = Icons.arrow_forward_ios; // fas fa-leaf
   static const IconData list = Icons.filter_list; // fas fa-leaf
+  static const IconData arrow_forward = Icons.arrow_forward_ios; // fas fa-leaf
+  static const IconData credit_card = Icons.credit_card; // fas fa-leaf
+  static const IconData ript = Icons.receipt; // fas fa-leaf
+  static const IconData chevron_right = Icons.chevron_right; // fas fa-leaf
+  static const IconData swap_horiz = Icons.swap_horiz; // fas fa-leaf
+  static const IconData checklist_rtl = Icons.checklist_rtl; // fachecklist_rtls fa-leaf
+  static const IconData build = Icons.build; // fachecklist_rtls fa-leaf
+  static const IconData arrow_update = Icons.arrow_upward; // fachecklist_rtls fa-leaf
 
 
 }
