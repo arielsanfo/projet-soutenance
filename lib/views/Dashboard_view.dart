@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/customs/app_constante.dart';
-import 'package:flutter_application_1/views/add_product_view.dart';
-import 'package:flutter_application_1/views/history_view.dart';
+import 'package:flutter_application_1/views/list_client_view.dart';
 import 'package:flutter_application_1/views/list_products_view.dart';
+import 'package:flutter_application_1/views/list_supplier_view.dart';
 import 'package:flutter_application_1/views/new_salescreen_view.dart';
+import 'package:flutter_application_1/views/report_expense_view.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -64,6 +65,16 @@ class DashboardScreen extends StatelessWidget {
   Widget _buildQuickAccessGrid(BuildContext context) {
     final quickActions = [
       {
+        'icon': Icons.outbox_rounded,
+        'label': 'nouvelle commande',
+        'onTap': () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => NewSaleScreen()),
+          );
+        },
+      },
+      {
         'icon': Icons.point_of_sale,
         'label': 'Nouvelle Vente',
         'onTap': () {
@@ -84,12 +95,22 @@ class DashboardScreen extends StatelessWidget {
         },
       },
       {
-        'icon': AppIcons.receipt,
-        'label': 'Commandes',
+        'icon': Icons.reset_tv,
+        'label': 'gestion des depenses',
+        'onTap': () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ExpenseReportScreen()),
+          );
+        },
+      },
+      {
+        'icon': AppIcons.suppliers,
+        'label': 'Fournisseurs',
         'onTap': () {
              Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddProductScreen()),
+            MaterialPageRoute(builder: (context) => SupplierListScreen()),
           );
           
         },
@@ -100,7 +121,7 @@ class DashboardScreen extends StatelessWidget {
         'onTap': () {
                 Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => SalesHistoryScreen()),
+            MaterialPageRoute(builder: (context) => ClientListScreen()),
           );
           
         },

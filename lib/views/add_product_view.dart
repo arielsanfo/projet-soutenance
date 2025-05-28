@@ -32,7 +32,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Nom du produit'),
+                decoration:  InputDecoration(labelText: 'Nom du produit'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Veuillez saisir un nom';

@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/views/detail_product_view.dart';
-import 'package:flutter_application_1/views/stock_view.dart';
-// import 'package:flutter_application_1/views/details_sale_view2.dart';
-// import 'package:flutter_application_1/views/inventory_view.dart';
-// import 'package:flutter_application_1/views/list_client_view.dart';
-// import 'package:flutter_application_1/views/login_view.dart';
+import 'package:flutter_application_1/views/login_view.dart';
+
+
 
 void main() {
   runApp(const MyApp());
@@ -33,7 +30,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: StockMovementScreen(),
+      home: LoginView(),
     );
   }
 }

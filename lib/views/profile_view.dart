@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/customs/app_constante.dart';
+import 'package:flutter_application_1/views/login_view.dart';
+import 'package:flutter_application_1/views/sign_view.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -7,7 +9,6 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       // appBar: AppBar(
       //   elevation: 0,
       //   title: Title(color:Colors.white, child: Text("Mon Profile")),
@@ -24,10 +25,9 @@ class ProfileScreen extends StatelessWidget {
                 style: AppTypography.titleLarge.apply(
                   color: AppColors.primaryColor,
                 ),
-                
               ),
-              
-               SizedBox(height: AppSpacings.xxxl),
+
+              SizedBox(height: AppSpacings.xxxl),
               Center(
                 child: Container(
                   width: 100,
@@ -81,7 +81,12 @@ class ProfileScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SignView()),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.backgroundWhite,
                     foregroundColor: AppColors.primaryColor,
@@ -97,7 +102,12 @@ class ProfileScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginView()),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.tagRedText,
                     foregroundColor: AppColors.textOnPrimary,
@@ -152,7 +162,10 @@ class ProfileScreen extends StatelessWidget {
             ],
           ),
           Spacer(),
-          IconButton(onPressed: (){}, icon: Icon(icon,color: AppColors.primaryDarker,))
+          IconButton(
+            onPressed: () {},
+            icon: Icon(icon, color: AppColors.primaryDarker),
+          ),
           // IconButton(icon, color: AppColors.primaryDarker),
         ],
       ),

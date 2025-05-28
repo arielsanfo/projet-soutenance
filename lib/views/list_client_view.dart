@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/customs/app_constante.dart';
+import 'package:flutter_application_1/views/add_client_view.dart';
+// import 'package:flutter_application_1/views/client_details_view.dart';
+import 'package:flutter_application_1/views/details_supplier_order_view.dart';
 // import 'package:intl/intl.dart';
 
 class ClientListScreen extends StatefulWidget {
@@ -107,10 +110,15 @@ class _ClientListScreenState extends State<ClientListScreen> {
 
       // Bouton d'ajout
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddCustomerScreen()),
+          );
+        },
         icon: Icon(AppIcons.person, size: AppSpacings.xxxl),
         label: Text('Ajouter un Client'),
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: AppColors.primaryColor,
         foregroundColor: AppColors.backgroundWhite,
         elevation: 1,
         shape: RoundedRectangleBorder(borderRadius: AppRadius.defaultRadius),
@@ -164,7 +172,9 @@ class ClientCard extends StatelessWidget {
     return Card(
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () {},
+        onTap: () {
+          //
+        },
         child: Padding(
           padding: EdgeInsets.all(AppSpacings.l),
           child: Row(

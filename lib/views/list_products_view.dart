@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/customs/app_constante.dart';
-import 'package:flutter_application_1/views/new_salescreen_view.dart';
+import 'package:flutter_application_1/views/add_product_view.dart';
+import 'package:flutter_application_1/views/detail_product_view.dart';
+// import 'package:flutter_application_1/views/new_salescreen_view.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({super.key});
@@ -53,11 +55,15 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:  Text('Liste des Produits'),
+        title: Text('Liste des Produits'),
         actions: [
           IconButton(
-            icon:  Icon(AppIcons.list),
+            icon: Icon(AppIcons.list),
             onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProductDetailScreen()),
+              );
               //
             },
           ),
@@ -118,7 +124,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => NewSaleScreen()),
+            MaterialPageRoute(builder: (context) => AddProductScreen()),
           );
         },
         icon: Icon(AppIcons.add),
