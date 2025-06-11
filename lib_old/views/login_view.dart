@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/customs/app_constante.dart';
-import 'package:flutter_application_1/views/Dashboard_view.dart';
-import 'package:flutter_application_1/views/sign_view.dart';
+import '../../lib/helpers/app_constante.dart';
+import 'Dashboard_view.dart';
+import 'sign_view.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});

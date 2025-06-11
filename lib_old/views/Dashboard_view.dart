@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/customs/app_constante.dart';
-import 'package:flutter_application_1/views/add_product_view.dart';
-import 'package:flutter_application_1/views/history_view.dart';
-import 'package:flutter_application_1/views/list_products_view.dart';
-import 'package:flutter_application_1/views/new_salescreen_view.dart';
+import '../../lib/helpers/app_constante.dart';
+import 'add_product_view.dart';
+import 'history_view.dart';
+import 'list_products_view.dart';
+import 'new_salescreen_view.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});

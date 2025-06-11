@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/customs/app_constante.dart';
-import 'package:flutter_application_1/views/new_salescreen_view.dart';
+import '../../lib/helpers/app_constante.dart';
+import 'new_salescreen_view.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({super.key});
