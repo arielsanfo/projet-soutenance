@@ -1,0 +1,7 @@
+android {
+    namespace "com.example.flutter_application_1"
+    compileSdkVersion flutter.compileSdkVersion
+    ndkVersion "27.0.12077973"
+
+    // ... existing code ...
+} 

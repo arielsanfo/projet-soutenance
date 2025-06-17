@@ -5,7 +5,7 @@ class DetailProductController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    int productId = Get.arguments;
+    // int productId = Get.arguments;
     
   }
 
