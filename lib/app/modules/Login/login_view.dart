@@ -7,7 +7,9 @@ import '../../../helpers/app_constante.dart';
 import 'login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
-  const LoginView({super.key});
+  LoginView({super.key}) {
+    Get.lazyPut(() => LoginController());
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -124,7 +126,9 @@ class LoginView extends GetView<LoginController> {
                                 ),
                               ),
                               onPressed: () {
-                                Get.toNamed(Routes.DASHBOARD,);
+                                Get.toNamed(
+                                  Routes.DASHBOARD,
+                                );
                               },
                             ),
                           ),
@@ -148,7 +152,7 @@ class LoginView extends GetView<LoginController> {
                                 ),
                               ),
                               onPressed: () {
-                               Get.toNamed(Routes.SIGN_UP);
+                                Get.toNamed(Routes.SIGN_UP);
                               },
                             ),
                           ),

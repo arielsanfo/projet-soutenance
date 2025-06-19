@@ -1,5 +1,5 @@
 import 'package:isar/isar.dart';
-
+part 'storage.g.dart';
 //part 'isar_models.g.dart'; // Assurez-vous d'exécuter build_runner
 
 // ignore_for_file: public_member_api_docs, sort_constructors_first, non_constant_identifier_names
