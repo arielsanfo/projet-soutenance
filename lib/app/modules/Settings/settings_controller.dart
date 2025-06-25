@@ -8,6 +8,14 @@ class SettingsController extends GetxController {
   bool lowStockAlerts = true;
 
   final count = 0.obs;
+
+  void toggleDarkMode(bool value) {
+    darkMode = value;
+    update();
+  }   
+
+
+
   @override
   void onInit() {
     super.onInit();
@@ -24,4 +32,14 @@ class SettingsController extends GetxController {
   }
 
   void increment() => count.value++;
+
+  void toggleSalesNotifications(bool value) {
+    salesNotifications = value;
+    update();
+  }
+
+  void toggleLowStockAlerts(bool value) {
+    lowStockAlerts = value;
+    update();
+  }
 }

@@ -15,7 +15,7 @@ class ProductService {
   Future<Product> saveProduct(Product product, {Id? categoryId}) async {
     await isar.writeTxn(() async {
       product.updatedAt = DateTime.now();
-      
+
       // Si un produit est créé, enregistrer le stock initial comme premier mouvement
       if (product.id == Isar.autoIncrement && product.stockQuantity! > 0) {
         final movement = InventoryMovement(
@@ -28,7 +28,7 @@ class ProductService {
       }
 
       await isar.products.put(product);
-      
+
       // Lier la catégorie
       if (categoryId != null) {
         final category = await isar.productCategorys.get(categoryId);
@@ -68,15 +68,17 @@ class ProductService {
     String? reason,
     String? relatedDocumentId,
     Id? userId,
+    bool inTransaction = false,
   }) async {
-    await isar.writeTxn(() async {
+    Future<void> doUpdate() async {
       final product = await isar.products.get(productId);
-      if (product == null) throw Exception("Produit avec l'ID $productId non trouvé.");
+      if (product == null)
+        throw Exception("Produit avec l'ID $productId non trouvé.");
 
       final newStock = product.stockQuantity! + quantityChange;
       product.stockQuantity = newStock;
       product.updatedAt = DateTime.now();
-      
+
       final movement = InventoryMovement(
         movementDate: DateTime.now(),
         type: movementType,
@@ -91,10 +93,18 @@ class ProductService {
         final user = await isar.users.get(userId);
         movement.processedByLink.value = user;
       }
-      
+
       await isar.products.put(product);
       await isar.inventoryMovements.put(movement);
-    });
+    }
+
+    if (inTransaction) {
+      await doUpdate();
+    } else {
+      await isar.writeTxn(() async {
+        await doUpdate();
+      });
+    }
   }
 
   // --- Gestion des Catégories ---
@@ -104,15 +114,29 @@ class ProductService {
     await isar.writeTxn(() => isar.productCategorys.put(category));
     return category;
   }
-  
+
   /// Obtenir toutes les catégories.
   Future<List<ProductCategory>> getAllCategories() async {
     return await isar.productCategorys.where().sortByName().findAll();
   }
-  
+
   /// Supprimer une catégorie.
   Future<bool> deleteCategory(Id id) async {
     // Attention: Gérer les produits orphelins si nécessaire avant suppression.
     return await isar.writeTxn(() => isar.productCategorys.delete(id));
+  }
+
+  /// Supprimer un produit et ses mouvements d'inventaire associés.
+  Future<bool> deleteProduct(Id id) async {
+    return await isar.writeTxn(() async {
+      // Supprimer les mouvements d'inventaire liés
+      await isar.inventoryMovements
+          .filter()
+          .productLink((q) => q.idEqualTo(id))
+          .deleteAll();
+
+      // Supprimer le produit
+      return await isar.products.delete(id);
+    });
   }
 }

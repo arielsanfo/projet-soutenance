@@ -11,105 +11,188 @@ class AddClientView extends GetView<AddClientController> {
 
   @override
   Widget build(BuildContext context) {
+    final isEditMode = Get.arguments != null;
+
     return Scaffold(
-      backgroundColor: AppColors.backgroundWhite,
+      backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
         backgroundColor: AppColors.backgroundWhite,
-        title: Text('Nouveau Client'),
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(AppIcons.backArrow, color: AppColors.textSecondary),
+          onPressed: () => Get.back(),
+        ),
+        title: Text(
+          isEditMode ? 'Modifier Client' : 'Nouveau Client',
+          style: AppTypography.titleLarge,
+        ),
         centerTitle: true,
       ),
       body: Form(
         key: controller.formKey,
         child: Column(
           children: [
+            // Header avec illustration
+            Container(
+              padding: EdgeInsets.all(AppSpacings.xl),
+              decoration: BoxDecoration(
+                color: AppColors.backgroundWhite,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(AppSpacings.m),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.primaryColor,
+                          AppColors.primaryDarker,
+                        ],
+                      ),
+                      borderRadius: AppRadius.circular,
+                    ),
+                    child: Icon(
+                      isEditMode ? AppIcons.edit : AppIcons.person,
+                      color: AppColors.textOnPrimary,
+                      size: 24,
+                    ),
+                  ),
+                  SizedBox(width: AppSpacings.l),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          isEditMode ? 'Modifier Client' : 'Nouveau Client',
+                          style: AppTypography.titleLarge,
+                        ),
+                        SizedBox(height: AppSpacings.xs),
+                        Text(
+                          isEditMode
+                              ? 'Mettez à jour les informations'
+                              : 'Ajoutez un nouveau client',
+                          style: AppTypography.bodyMedium.copyWith(
+                            color: AppColors.textLight,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Formulaire
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(AppSpacings.l),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Section Informations Client
-                    Text(
-                      'Informations du Client',
-                      style: AppTypography.titleMedium,
+                    // Section Informations Personnelles
+                    _buildSectionCard(
+                      title: 'Informations Clients',
+                      icon: AppIcons.person,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildTextField(
+                                controller: controller.firstNameController,
+                                label: 'Prénom',
+                                icon: AppIcons.person,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Veuillez entrer un prénom';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                            SizedBox(width: AppSpacings.m),
+                            Expanded(
+                              child: _buildTextField(
+                                controller: controller.lastNameController,
+                                label: 'Nom',
+                                icon: AppIcons.person,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Veuillez entrer un nom';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                    SizedBox(height: AppSpacings.l),
+                    SizedBox(height: AppSpacings.xl),
 
-                    // Champ Prénom
-                    TextFormField(
-                      controller: controller.firstNameController,
-                      decoration: InputDecoration(
-                        hintText: 'Prénom',
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Veuillez entrer un prénom';
-                        }
-                        return null;
-                      },
+                    // Section Contact
+                    _buildSectionCard(
+                      title: 'Informations de Contact',
+                      icon: AppIcons.email,
+                      children: [
+                        _buildTextField(
+                          controller: controller.emailController,
+                          label: 'Adresse email',
+                          icon: AppIcons.email,
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+                            if (value != null &&
+                                value.isNotEmpty &&
+                                !value.contains('@')) {
+                              return 'Veuillez entrer un email valide';
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: AppSpacings.l),
+                        _buildTextField(
+                          controller: controller.phoneController,
+                          label: 'Numéro de téléphone',
+                          icon: Icons.phone_outlined,
+                          keyboardType: TextInputType.phone,
+                        ),
+                      ],
                     ),
-                    SizedBox(height: AppSpacings.s),
+                    SizedBox(height: AppSpacings.xl),
 
-                    // Champ Nom
-                    TextFormField(
-                      controller: controller.lastNameController,
-                      decoration: InputDecoration(
-                        hintText: 'Nom',
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Veuillez entrer un nom';
-                        }
-                        return null;
-                      },
+                    // Section Adresse
+                    _buildSectionCard(
+                      title: 'Adresse',
+                      icon: Icons.location_on_outlined,
+                      children: [
+                        _buildTextField(
+                          controller: controller.addressController,
+                          label: 'Adresse complète',
+                          icon: Icons.home_outlined,
+                          maxLines: 3,
+                        ),
+                      ],
                     ),
-                    SizedBox(height: AppSpacings.s),
+                    SizedBox(height: AppSpacings.xl),
 
-                    // Champ Email
-                    TextFormField(
-                      controller: controller.emailController,
-                      decoration: InputDecoration(
-                        hintText: 'Email',
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value != null &&
-                            value.isNotEmpty &&
-                            !value.contains('@')) {
-                          return 'Veuillez entrer un email valide';
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: AppSpacings.s),
-
-                    // Champ Téléphone
-                    TextFormField(
-                      controller: controller.phoneController,
-                      decoration: InputDecoration(
-                        hintText: 'Téléphone',
-                      ),
-                      keyboardType: TextInputType.phone,
-                    ),
-                    SizedBox(height: AppSpacings.s),
-
-                    // Champ Adresse
-                    TextFormField(
-                      controller: controller.addressController,
-                      decoration: InputDecoration(
-                        hintText: 'Adresse complète',
-                      ),
-                      maxLines: 2,
-                    ),
-                    SizedBox(height: AppSpacings.s),
-
-                    // Champ Notes
-                    TextFormField(
-                      controller: controller.notesController,
-                      decoration: InputDecoration(
-                        hintText: 'Notes (Facultatif)',
-                      ),
-                      maxLines: 3,
+                    // Section Notes
+                    _buildSectionCard(
+                      title: 'Notes supplémentaires',
+                      icon: Icons.note_outlined,
+                      children: [
+                        _buildTextField(
+                          controller: controller.notesController,
+                          label: 'Notes (facultatif)',
+                          icon: AppIcons.edit,
+                          maxLines: 4,
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -117,28 +200,92 @@ class AddClientView extends GetView<AddClientController> {
             ),
 
             // Bouton Enregistrer
-            Padding(
+            Container(
               padding: EdgeInsets.all(AppSpacings.xl),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                  backgroundColor: AppColors.primaryColor,
-                  minimumSize: Size(double.infinity, AppSpacings.xxl),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacings.m),
+              decoration: BoxDecoration(
+                color: AppColors.backgroundWhite,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 10,
+                    offset: Offset(0, -5),
                   ),
+                ],
+              ),
+              child: Container(
+                width: double.infinity,
+                height: 56,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.primaryColor,
+                      AppColors.primaryDarker,
+                    ],
+                  ),
+                  borderRadius: AppRadius.large,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryColor.withOpacity(0.3),
+                      blurRadius: 10,
+                      offset: Offset(0, 5),
+                    ),
+                  ],
                 ),
-                onPressed: () {
-                  if (controller.formKey.currentState!.validate()) {
-                    _saveCustomer(context);
-                    //
-                    Get.toNamed(Routes.DETAILS_CLIENT);
-                  }
-                },
-                child: Text(
-                  'Enregistrer Client',
-                  style: AppTypography.bodyMedium
-                      .apply(color: AppColors.textOnPrimary),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (controller.formKey.currentState!.validate()) {
+                      await controller.saveCustomer();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Row(
+                            children: [
+                              Icon(
+                                isEditMode ? AppIcons.success : AppIcons.person,
+                                color: AppColors.textOnPrimary,
+                              ),
+                              SizedBox(width: AppSpacings.m),
+                              Text(
+                                isEditMode
+                                    ? 'Client modifié avec succès'
+                                    : 'Client enregistré avec succès',
+                              ),
+                            ],
+                          ),
+                          backgroundColor: AppColors.accentColor,
+                          duration: AppDurations.snackbarDuration,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: AppRadius.medium,
+                          ),
+                        ),
+                      );
+                      Get.offAllNamed(Routes.CLIENT_LIST);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: AppRadius.large,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        isEditMode ? AppIcons.edit : AppIcons.person,
+                        color: AppColors.textOnPrimary,
+                        size: 24,
+                      ),
+                      SizedBox(width: AppSpacings.m),
+                      Text(
+                        isEditMode ? 'Modifier Client' : 'Enregistrer Client',
+                        style: AppTypography.labelLarge.copyWith(
+                          color: AppColors.textOnPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -148,34 +295,117 @@ class AddClientView extends GetView<AddClientController> {
     );
   }
 
-  void _saveCustomer(BuildContext context) {
-    // Logique d'enregistrement du client
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Client enregistré avec succès'),
-        duration: Duration(seconds: AppSpacings.l.toInt()),
+  Widget _buildSectionCard({
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
+    return Container(
+      padding: EdgeInsets.all(AppSpacings.xl),
+      decoration: BoxDecoration(
+        color: AppColors.backgroundWhite,
+        borderRadius: AppRadius.large,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(AppSpacings.s),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryColor.withOpacity(0.1),
+                  borderRadius: AppRadius.small,
+                ),
+                child: Icon(
+                  icon,
+                  color: AppColors.primaryColor,
+                  size: 20,
+                ),
+              ),
+              SizedBox(width: AppSpacings.m),
+              Text(
+                title,
+                style: AppTypography.titleMedium,
+              ),
+            ],
+          ),
+          SizedBox(height: AppSpacings.xl),
+          ...children,
+        ],
       ),
     );
-    // ignore: unused_local_variable
-    final newCustomer = {
-      'firstName': controller.firstNameController.text,
-      'lastName': controller.lastNameController.text,
-      'email': controller.emailController.text,
-      'phone': controller.phoneController.text,
-      'address': controller.addressController.text,
-      'notes': controller.notesController.text,
-    };
+  }
 
-    // Afficher un message de confirmation
-
-    // Effacer les champs après enregistrement
-    controller.firstNameController.clear();
-    controller.lastNameController.clear();
-    controller.emailController.clear();
-    controller.phoneController.clear();
-    controller.notesController.clear();
-    controller.addressController.clear();
-    controller.notesController.clear();
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    TextInputType? keyboardType,
+    int maxLines = 1,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      validator: validator,
+      style: AppTypography.bodyMedium,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: AppTypography.labelMedium.copyWith(
+          color: AppColors.textLight,
+        ),
+        prefixIcon: Container(
+          margin: EdgeInsets.only(right: AppSpacings.m),
+          padding: EdgeInsets.all(AppSpacings.s),
+          decoration: BoxDecoration(
+            color: AppColors.primaryColor.withOpacity(0.1),
+            borderRadius: AppRadius.small,
+          ),
+          child: Icon(
+            icon,
+            color: AppColors.primaryColor,
+            size: 20,
+          ),
+        ),
+        filled: true,
+        fillColor: AppColors.backgroundInput,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadius.rDefault),
+          borderSide: BorderSide(color: AppColors.borderLight),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadius.rDefault),
+          borderSide: BorderSide(
+            color: AppColors.primaryColor,
+            width: 2,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadius.rDefault),
+          borderSide: BorderSide(
+            color: AppColors.errorColor,
+            width: 2,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppRadius.rDefault),
+          borderSide: BorderSide(color: AppColors.borderLight),
+        ),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: AppSpacings.l,
+          vertical: AppSpacings.l,
+        ),
+      ),
+    );
   }
 }
 

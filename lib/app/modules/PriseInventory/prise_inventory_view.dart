@@ -7,7 +7,10 @@ import 'package:get/get.dart';
 import 'prise_inventory_controller.dart';
 
 class PriseInventoryView extends GetView<PriseInventoryController> {
-  const PriseInventoryView({super.key});
+   PriseInventoryView({super.key}){
+        Get.lazyPut(()=>PriseInventoryView());
+
+  }
 
   @override
   Widget build(BuildContext context) {

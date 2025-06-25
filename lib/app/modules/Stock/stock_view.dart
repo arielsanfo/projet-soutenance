@@ -6,8 +6,10 @@ import 'package:get/get.dart';
 import 'stock_controller.dart';
 
 class StockView extends GetView<StockController> {
-  const StockView({super.key});
-@override
+  StockView({super.key}) {
+    Get.lazyPut(() => StockView());
+  }
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundWhite,
@@ -41,8 +43,8 @@ class StockView extends GetView<StockController> {
             child: ListView.separated(
               padding: EdgeInsets.symmetric(horizontal: AppSpacings.l),
               itemCount: controller.movements.length + 1,
-              separatorBuilder:
-                  (context, index) => SizedBox(height: AppSpacings.s),
+              separatorBuilder: (context, index) =>
+                  SizedBox(height: AppSpacings.s),
               itemBuilder: (context, index) {
                 if (index == controller.movements.length) {
                   return Padding(
@@ -136,10 +138,9 @@ class StockView extends GetView<StockController> {
                         text:
                             ' (${movement.quantity > 0 ? '+' : ''}${movement.quantity} unités)',
                         style: TextStyle(
-                          color:
-                              movement.quantity > 0
-                                  ? AppColors.tagGreenText
-                                  : AppColors.errorColor,
+                          color: movement.quantity > 0
+                              ? AppColors.tagGreenText
+                              : AppColors.errorColor,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -204,4 +205,3 @@ class StockView extends GetView<StockController> {
     ][month - 1];
   }
 }
-

@@ -1,79 +1,94 @@
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-class CartItem {
-  final String id;
-  final String name;
-  final double price;
-  final int quantity;
-
-  CartItem({
-    required this.id,
-    required this.name,
-    required this.price,
-    required this.quantity,
-  });
-
-  CartItem copyWith({int? quantity}) {
-    return CartItem(
-      id: id,
-      name: name,
-      price: price,
-      quantity: quantity ?? this.quantity,
-    );
-  }
-}
+import 'package:isar/isar.dart';
+import '../../data/storage.dart';
+import '../../data/controller/saleService.dart';
 
 class AddOrderController extends GetxController {
-  final List<CartItem> cartItems = [
-    CartItem(id: 'P1', name: 'Pommes Gala Bio (1kg)', price: 2.99, quantity: 2),
-    CartItem(id: 'P2', name: 'Bananes Cavendish', price: 1.49, quantity: 3),
-    CartItem(id: 'P3', name: 'Lait Demi-écrémé 1L', price: 0.99, quantity: 1),
-  ];
+  final products = <Product>[].obs;
+  final customers = <Customer>[].obs;
+  final cartItems = <SaleItem>[].obs;
+  final selectedCustomer = Rxn<Customer>();
+  final paymentMethod = ''.obs;
+  final isLoading = false.obs;
 
-  double get subtotal =>
-      cartItems.fold(0, (sum, item) => sum + (item.price * item.quantity));
-  double get vat => subtotal * 0.2;
-  double get total => subtotal + vat;
+  late final Isar isar;
+  late final SaleService saleService;
 
-  void updateQuantity(int index, int newQuantity) {
-    // setState(() {
-    if (newQuantity > 0) {
-      cartItems[index] = cartItems[index].copyWith(quantity: newQuantity);
-    } else {
-      cartItems.removeAt(index);
-    }
-    // });
-  }
+  var currentSale;
 
-  void removeItem(int index) {
-    // setState(() {
-    cartItems.removeAt(index);
-    // });
-  }
-
-  void proceedToPayment(BuildContext context) {
-    // Logique de paiement ici
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Paiement en cours...')),
-    );
-  }
-
-  final count = 0.obs;
   @override
   void onInit() {
     super.onInit();
+    isar = Get.find<Isar>();
+    saleService = SaleService(isar);
+    loadProducts();
+    loadCustomers();
   }
 
-  @override
-  void onReady() {
-    super.onReady();
+  Future<void> loadProducts() async {
+    final result = await isar.products.where().findAll();
+    products.assignAll(result);
   }
 
-  @override
-  void onClose() {
-    super.onClose();
+  Future<void> loadCustomers() async {
+    final result = await isar.customers.where().findAll();
+    customers.assignAll(result);
   }
 
-  void increment() => count.value++;
+  void addProductToCart(Product product, int quantity) {
+    final existing = cartItems
+        .firstWhereOrNull((item) => item.productLink.value?.id == product.id);
+    if (existing != null) {
+      existing.quantity = (existing.quantity ?? 0) + quantity;
+      existing.totalPrice =
+          (existing.quantity ?? 0) * (existing.unitPriceAtSale ?? 0.0);
+      cartItems.refresh();
+    } else {
+      final item = SaleItem(
+        quantity: quantity,
+        unitPriceAtSale: product.salePrice ?? 0.0,
+      );
+      item.productLink.value = product;
+      item.totalPrice = (item.quantity ?? 0) * (item.unitPriceAtSale ?? 0.0);
+      cartItems.add(item);
+    }
+  }
+
+  void updateQuantity(int index, int newQuantity) {
+    if (newQuantity > 0) {
+      cartItems[index].quantity = newQuantity;
+      cartItems[index].totalPrice =
+          newQuantity * (cartItems[index].unitPriceAtSale ?? 0.0);
+      cartItems.refresh();
+    } else {
+      cartItems.removeAt(index);
+    }
+  }
+
+  void removeItem(int index) {
+    cartItems.removeAt(index);
+  }
+
+  double get subtotal =>
+      cartItems.fold(0, (sum, item) => sum + (item.totalPrice ?? 0.0));
+  double get vat => subtotal * 0.2;
+  double get total => subtotal + vat;
+
+  Future<void> saveOrder() async {
+    if (selectedCustomer.value == null || cartItems.isEmpty) {
+      Get.snackbar('Erreur', 'Sélectionnez un client et ajoutez des produits.');
+      return;
+    }
+    isLoading.value = true;
+    await saleService.processNewSale(
+      items: cartItems.toList(),
+      customerId: selectedCustomer.value!.id,
+      paymentMethod:
+          paymentMethod.value.isNotEmpty ? paymentMethod.value : 'Espèces',
+    );
+    isLoading.value = false;
+    Get.snackbar('Succès', 'Commande enregistrée !');
+    cartItems.clear();
+  }
 }

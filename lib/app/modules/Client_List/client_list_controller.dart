@@ -1,63 +1,77 @@
+import 'package:flutter_application_1/app/routes/app_pages.dart';
 import 'package:get/get.dart';
+import 'package:isar/isar.dart';
+import '../../data/controller/customerService.dart';
+import '../../data/storage.dart';
+import 'package:flutter/material.dart';
+// import 'package:app/routes/app_routes.dart';
 
 class ClientListController extends GetxController {
   final RxString searchQuery = ''.obs;
-  late final RxList<Client> filteredClients;
+  late final RxList<Customer> clients = <Customer>[].obs;
+  late final RxList<Customer> filteredClients = <Customer>[].obs;
+  late final CustomerService customerService;
 
   @override
   void onInit() {
     super.onInit();
-    filteredClients = clients.obs;
+    final isar = Get.find<Isar>();
+    customerService = CustomerService(isar);
+    loadClients();
     ever(searchQuery, (_) => _filterClients());
   }
 
-  void _filterClients() {
-    filteredClients.value = clients.where((client) {
-      final fullName = '${client.firstName} ${client.lastName}'.toLowerCase();
-      return fullName.contains(searchQuery.value.toLowerCase());
-    }).toList();
+  Future<void> loadClients() async {
+    clients.value = await customerService.getAllCustomers();
+    _filterClients();
   }
 
-  final List<Client> clients = [
-    Client(
-      id: '1',
-      firstName: 'Alexandre',
-      lastName: 'Dupont',
-      email: 'alex.d@example.com',
-      lastPurchase: DateTime(2024, 5, 5),
-      debt: 12.0,
-    ),
-    Client(
-      id: '2',
-      firstName: 'Sophie',
-      lastName: 'Martin',
-      email: 'sophie.m@example.com',
-      lastPurchase: DateTime(2024, 5, 10),
-      debt: 0.0,
-    ),
-    Client(
-      id: '3',
-      firstName: 'Thomas',
-      lastName: 'Leroy',
-      email: 'thomas.l@example.com',
-      lastPurchase: DateTime(2024, 4, 28),
-      debt: 45.50,
-    ),
-    Client(
-      id: '4',
-      firstName: 'Émilie',
-      lastName: 'Bernard',
-      email: 'emilie.b@example.com',
-      lastPurchase: DateTime(2024, 5, 12),
-      debt: 0.0,
-    ),
-  ];
+  void _filterClients() {
+    if (searchQuery.value.isEmpty) {
+      filteredClients.value = clients;
+    } else {
+      final query = searchQuery.value.toLowerCase();
+      filteredClients.value = clients.where((client) {
+        final name = (client.name ?? '').toLowerCase();
+        final email = (client.email ?? '').toLowerCase();
+        final phone = (client.phone ?? '').toLowerCase();
 
-  final count = 0.obs;
-  // @override
-  // void onInit() {
-  //   super.onInit();
-  // }
+        return name.contains(query) ||
+            email.contains(query) ||
+            phone.contains(query);
+      }).toList();
+    }
+  }
+
+  Future<void> deleteCustomer(Customer customer) async {
+    try {
+      await customerService.delete(customer.id!);
+      await loadClients(); // Recharger la liste
+      Get.snackbar(
+        'Succès',
+        'Client supprimé avec succès',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Erreur',
+        'Impossible de supprimer le client',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  void editCustomer(Customer customer) {
+    // Passer les données du client à la page de modification
+    Get.toNamed(Routes.ADD_CLIENT, arguments: customer);
+  }
+    void navigateToDetails(Customer customer) {
+    Get.toNamed(Routes.DETAILS_CLIENT, arguments: customer);
+  }
 
   @override
   void onReady() {
@@ -68,8 +82,6 @@ class ClientListController extends GetxController {
   void onClose() {
     super.onClose();
   }
-
-  void increment() => count.value++;
 }
 
 class Client {
@@ -89,5 +101,3 @@ class Client {
     required this.debt,
   });
 }
-
-String searchQuery = '';

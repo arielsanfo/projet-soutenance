@@ -6,7 +6,10 @@ import 'package:get/get.dart';
 import 'history_controller.dart';
 
 class HistoryView extends GetView<HistoryController> {
-  const HistoryView({super.key});
+   HistoryView({super.key}){
+        Get.lazyPut(() => HistoryView());
+
+  }
  @override
   Widget build(BuildContext context) {
     return Scaffold(

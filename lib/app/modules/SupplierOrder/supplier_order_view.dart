@@ -7,7 +7,10 @@ import 'package:get/get.dart';
 import 'supplier_order_controller.dart';
 
 class SupplierOrderView extends GetView<SupplierOrderController> {
-  const SupplierOrderView({super.key});
+   SupplierOrderView({super.key}){
+    Get.lazyPut(()=>SupplierOrderView());
+
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

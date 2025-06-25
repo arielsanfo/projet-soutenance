@@ -6,7 +6,10 @@ import 'package:get/get.dart';
 import 'notification_controller.dart';
 
 class NotificationView extends GetView<NotificationController> {
-  const NotificationView({super.key});
+   NotificationView({super.key}){
+        Get.lazyPut(() => NotificationView());
+
+  }
     @override
   Widget build(BuildContext context) {
     return Scaffold(

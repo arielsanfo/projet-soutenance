@@ -1,34 +1,35 @@
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:isar/isar.dart';
+import '../../data/storage.dart';
 
 class DetailsOrderController extends GetxController {
-    String selectedStatus = 'En préparation';
-  final TextEditingController trackingController = TextEditingController();
-  final List<Map<String, dynamic>> items = [
-    {'name': 'Café en grains (250g)', 'qty': 2, 'price': 7.50},
-    {'name': 'Thé vert bio (100g)', 'qty': 1, 'price': 4.60},
-    {'name': 'Sucre de canne (1kg)', 'qty': 3, 'price': 3.00},
-  ];
+  final sale = Rxn<Sale>();
+  final saleItems = <SaleItem>[].obs;
+  final customer = Rxn<Customer>();
+  final isLoading = false.obs;
+  late final Isar isar;
 
-  double get totalAmount {
-    return items.fold(0, (sum, item) => sum + (item['price'] * item['qty']));
-  }
-
-  final count = 0.obs;
   @override
   void onInit() {
     super.onInit();
+    isar = Get.find<Isar>();
+    final arg = Get.arguments;
+    if (arg != null && arg is Sale) {
+      sale.value = arg;
+      loadDetails();
+  }
   }
 
-  @override
-  void onReady() {
-    super.onReady();
+  Future<void> loadDetails() async {
+    isLoading.value = true;
+    if (sale.value != null) {
+      await sale.value!.saleItems.load();
+      saleItems.assignAll(sale.value!.saleItems.toList());
+      await sale.value!.customerLink.load();
+      customer.value = sale.value!.customerLink.value;
+    }
+    isLoading.value = false;
   }
 
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
-  void increment() => count.value++;
+  double get totalAmount => sale.value?.totalPrice ?? 0.0;
 }

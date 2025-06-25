@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/app/routes/app_pages.dart';
+// import 'package:flutter_application_1/app/routes/app_pages.dart';
 import 'package:flutter_application_1/helpers/app_constante.dart';
+import '../../data/storage.dart';
 
 import 'package:get/get.dart';
 
 import 'profile_controller.dart';
 
 class ProfileView extends GetView<ProfileController> {
-  const ProfileView({super.key});
+   ProfileView({super.key}){
+    Get.lazyPut(()=>ProfileView());
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,7 +42,12 @@ class ProfileView extends GetView<ProfileController> {
                   ),
                   child: Center(
                     child: Text(
-                      'AR',
+                      (controller.currentUser?.name != null &&
+                              controller.currentUser!.name!.isNotEmpty)
+                          ? controller.currentUser!.name!
+                              .substring(0, 2)
+                              .toUpperCase()
+                          : '--',
                       style: AppTypography.displayLarge.apply(
                         color: AppColors.textOnPrimary,
                       ),
@@ -50,16 +58,16 @@ class ProfileView extends GetView<ProfileController> {
               SizedBox(height: AppSpacings.xl),
               Center(
                 child: Text(
-                  'Ariel Sanfo',
+                  controller.currentUser?.name ?? 'Non renseigné',
                   style: AppTypography.titleMedium.apply(
                     color: AppColors.textPrimary,
                   ),
                 ),
               ),
               SizedBox(height: AppSpacings.l),
-              const Center(
+              Center(
                 child: Text(
-                  'arielsanfo@gmail.com',
+                  controller.currentUser?.email ?? 'Non renseigné',
                   style: AppTypography.titleSmall,
                 ),
               ),
@@ -67,20 +75,20 @@ class ProfileView extends GetView<ProfileController> {
               _buildInfoCard(
                 icon: Icons.person_outline,
                 label: 'Rôle',
-                value: 'Administrateur',
+                value: _roleToString(controller.currentUser?.role),
               ),
               SizedBox(height: AppSpacings.l),
               _buildInfoCard(
                 icon: Icons.calendar_today,
                 label: 'Membre depuis',
-                value: '12 Mars 2020',
+                value: _formatDate(controller.currentUser?.createdAt),
               ),
               const Spacer(),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Get.toNamed(Routes.DASHBOARD);
+                    _showEditProfileDialog(context, controller);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.backgroundWhite,
@@ -97,7 +105,9 @@ class ProfileView extends GetView<ProfileController> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    controller.logout();
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.tagRedText,
                     foregroundColor: AppColors.textOnPrimary,
@@ -161,6 +171,99 @@ class ProfileView extends GetView<ProfileController> {
           // IconButton(icon, color: AppColors.primaryDarker),
         ],
       ),
+    );
+  }
+
+  String _roleToString(dynamic role) {
+    if (role == null) return 'Non renseigné';
+    switch (role) {
+      case UserRoleIsar.admin:
+        return 'Administrateur';
+      case UserRoleIsar.manager:
+        return 'Manager';
+      case UserRoleIsar.employee:
+        return 'Employé';
+      default:
+        return role.toString();
+    }
+  }
+
+  String _formatDate(DateTime? date) {
+    if (date == null) return 'Non renseigné';
+    // Format français : 12 Mars 2024
+    final months = [
+      '',
+      'Janvier',
+      'Février',
+      'Mars',
+      'Avril',
+      'Mai',
+      'Juin',
+      'Juillet',
+      'Août',
+      'Septembre',
+      'Octobre',
+      'Novembre',
+      'Décembre'
+    ];
+    return '${date.day} ${months[date.month]} ${date.year}';
+  }
+
+  void _showEditProfileDialog(
+      BuildContext context, ProfileController controller) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Modifier le profil'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: controller.nameController,
+                  decoration: InputDecoration(labelText: 'Nom complet'),
+                ),
+                SizedBox(height: 12),
+                TextField(
+                  controller: controller.emailController,
+                  decoration: InputDecoration(labelText: 'Email'),
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                SizedBox(height: 12),
+                TextField(
+                  controller: controller.passwordController,
+                  decoration:
+                      InputDecoration(labelText: 'Nouveau mot de passe'),
+                  obscureText: true,
+                ),
+                SizedBox(height: 12),
+                TextField(
+                  controller: controller.confirmPasswordController,
+                  decoration:
+                      InputDecoration(labelText: 'Confirmer le mot de passe'),
+                  obscureText: true,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Annuler'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await controller.updateProfile();
+                Navigator.of(context).pop();
+              },
+              child: Text('Enregistrer'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -6,7 +6,9 @@ import 'package:get/get.dart';
 import 'reception_controller.dart';
 
 class ReceptionView extends GetView<ReceptionController> {
-  const ReceptionView({super.key});
+   ReceptionView({super.key}){
+    Get.lazyPut(()=>ReceptionView());
+  }
 
   @override
   Widget build(BuildContext context) {

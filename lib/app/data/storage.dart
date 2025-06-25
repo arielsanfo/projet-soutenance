@@ -8,7 +8,7 @@ part 'storage.g.dart';
 
 enum UserRoleIsar { admin, manager, employee }
 
-enum SaleStatusIsar { pending, completed, returned, cancelled }
+enum SaleStatusIsar { pending, completed, returned, cancelled, refunded }
 
 enum OrderStatusIsar { pending, processing, shipped, delivered, cancelled }
 
@@ -23,6 +23,7 @@ enum SupplierOrderStatusIsar {
 enum InventoryMovementTypeIsar {
   initialStock, // Stock initial lors de la création du produit
   sale, // Vente d'un produit
+  saleCancellation, // Annulation d'une vente (retour en stock)
   purchaseReceived, // Réception d'une commande fournisseur
   adjustmentIn, // Ajustement manuel positif (ex: trouvaille)
   adjustmentOut, // Ajustement manuel négatif (ex: casse, perte)

@@ -6,7 +6,9 @@ import 'package:get/get.dart';
 import 'tracking_order_controller.dart';
 
 class TrackingOrderView extends GetView<TrackingOrderController> {
-  const TrackingOrderView({super.key});
+ TrackingOrderView({super.key}){
+    Get.lazyPut(()=>TrackingOrderView());
+  }
   @override
  @override
   Widget build(BuildContext context) {

@@ -1,169 +1,110 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/app/routes/app_pages.dart';
 import 'package:flutter_application_1/helpers/app_constante.dart';
-
 import 'package:get/get.dart';
-
+// import '../../helpers/app_constante.dart';
 import 'order_list_controller.dart';
+import '../../data/storage.dart';
 
 class OrderListView extends GetView<OrderListController> {
-  const OrderListView({super.key});
+  OrderListView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundWhite,
+      backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        title: Text('Détails Commande Client #C20240078',
-            style: AppTypography.titleLarge),
+        title: Text('Commandes clients', style: AppTypography.titleLarge),
         centerTitle: true,
-        elevation: 0,
         backgroundColor: AppColors.backgroundWhite,
+        elevation: 0,
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(AppSpacings.xxl),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildClientInfo(),
-            SizedBox(height: AppSpacings.l),
-            _buildOrderedItems(),
-            SizedBox(height: AppSpacings.l),
-            _buildTotalSection(),
-            SizedBox(height: AppSpacings.l),
-            _buildStatusTrackingSection(),
-            SizedBox(height: AppSpacings.xl),
-            _buildUpdateButton(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildClientInfo() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Béatrice Martin', style: AppTypography.titleMedium),
-        SizedBox(height: AppSpacings.s),
-        Text('12 Rue de la Paix, 75002 Paris', style: AppTypography.bodyMedium),
-        Divider(height: AppSpacings.l),
-      ],
-    );
-  }
-
-  Widget _buildOrderedItems() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Articles Commandés', style: AppTypography.titleMedium),
-        SizedBox(height: AppSpacings.l),
-        ListView.separated(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: controller.items.length,
-          separatorBuilder: (context, index) => SizedBox(height: AppSpacings.l),
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return Center(child: CircularProgressIndicator());
+        }
+        if (controller.sales.isEmpty) {
+          return Center(
+              child: Text('Aucune commande trouvée',
+                  style: AppTypography.bodyMedium));
+        }
+        return ListView.separated(
+          padding: EdgeInsets.all(AppSpacings.l),
+          itemCount: controller.sales.length,
+          separatorBuilder: (_, __) => SizedBox(height: AppSpacings.m),
           itemBuilder: (context, index) {
-            final item = controller.items[index];
-            return Row(
+            final sale = controller.sales[index];
+            return Card(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+              elevation: 2,
+              child: ListTile(
+                contentPadding: EdgeInsets.all(AppSpacings.l),
+                title: Text('Vente #${sale.saleNumber ?? sale.id}',
+                    style: AppTypography.titleMedium),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: AppSpacings.s,
-                  height: AppSpacings.s,
-                  margin: EdgeInsets.only(right: AppSpacings.s),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryColor,
-                    shape: BoxShape.circle,
-                  ),
+                    SizedBox(height: 4),
+                    FutureBuilder<Customer?>(
+                      future: sale.customerLink.value == null
+                          ? null
+                          : Future.value(sale.customerLink.value),
+                      builder: (context, snapshot) {
+                        final name = snapshot.data?.name ?? 'Client inconnu';
+                        return Text(name,
+                            style: AppTypography.bodySmall
+                                .copyWith(color: AppColors.textSecondary));
+                      },
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                        'Date : ${sale.saleDate?.toString().split(' ').first ?? ''}',
+                        style: AppTypography.bodySmall),
+                  ],
                 ),
-                Expanded(
-                  child: Text('${item['name']} x${item['qty']}',
-                      style: AppTypography.bodyMedium),
+                trailing: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('${(sale.totalPrice ?? 0.0).toStringAsFixed(2)} €',
+                        style: AppTypography.titleSmall
+                            .copyWith(color: AppColors.primaryColor)),
+                    SizedBox(height: 8),
+                    _buildStatusChip(sale.status),
+                  ],
                 ),
-                Text('${(item['price'] * item['qty']).toStringAsFixed(2)} €',
-                    style: AppTypography.bodyMedium),
-              ],
+                onTap: () => controller.goToDetails(sale),
+              ),
             );
           },
-        ),
-        Divider(height: AppSpacings.xxl, color: AppColors.greyMedium),
-      ],
+        );
+      }),
     );
   }
 
-  Widget _buildTotalSection() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text('Total:', style: AppTypography.titleMedium),
-        Text('${controller.totalAmount.toStringAsFixed(2)} €',
-            style:
-                AppTypography.titleLarge.apply(color: AppColors.primaryColor)),
-      ],
-    );
-  }
-
-  Widget _buildStatusTrackingSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Statut & Suivi', style: AppTypography.titleMedium),
-        SizedBox(height: AppSpacings.xl),
-        DropdownButtonFormField<String>(
-          value: controller.selectedStatus,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: AppColors.greyLight,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacings.l),
-              borderSide: BorderSide.none,
-            ),
-            contentPadding: EdgeInsets.symmetric(
-                horizontal: AppSpacings.xl, vertical: AppSpacings.xxl),
-          ),
-          items: ['En préparation', 'Envoyée', 'Livrée', 'Annulée']
-              .map((status) => DropdownMenuItem(
-                    value: status,
-                    child: Text(status, style: AppTypography.titleSmall),
-                  ))
-              .toList(),
-          onChanged: (String? value) {
-            //
-          },
-        ),
-        SizedBox(height: AppSpacings.xxl),
-        TextFormField(
-          controller: controller.trackingController,
-          decoration: InputDecoration(
-            hintText: 'N° de suivi (si applicable)',
-            filled: true,
-            fillColor: AppColors.greyLight,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacings.l),
-              borderSide: BorderSide.none,
-            ),
-            contentPadding: EdgeInsets.symmetric(
-                horizontal: AppSpacings.xl, vertical: AppSpacings.xxl),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildUpdateButton() {
-    return ElevatedButton(
-      onPressed: () {
-        Get.toNamed(Routes.DETAILS_ORDER);
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primaryColor,
-        minimumSize: Size(double.infinity, AppSpacings.xxl * 3),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacings.l),
-        ),
-      ),
-      child: Text('Mettre à Jour la Commande',
-          style: AppTypography.bodyLarge.apply(color: AppColors.textOnPrimary)),
+  Widget _buildStatusChip(SaleStatusIsar? status) {
+    String label = 'Inconnu';
+    Color color = Colors.grey;
+    switch (status) {
+      case SaleStatusIsar.completed:
+        label = 'Complétée';
+        color = Colors.green;
+        break;
+      case SaleStatusIsar.cancelled:
+        label = 'Annulée';
+        color = Colors.red;
+        break;
+      case SaleStatusIsar.refunded:
+        label = 'Remboursée';
+        color = Colors.orange;
+        break;
+      default:
+        label = 'En cours';
+        color = Colors.blueGrey;
+    }
+    return Chip(
+      label: Text(label, style: TextStyle(color: Colors.white)),
+      backgroundColor: color,
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
     );
   }
 }

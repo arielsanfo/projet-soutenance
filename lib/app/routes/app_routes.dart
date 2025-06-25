@@ -8,6 +8,7 @@ abstract class Routes {
   static const DASHBOARD = _Paths.DASHBOARD;
   static const SIGN_UP = _Paths.SIGN_UP;
   static const DETAIL_PRODUCT = _Paths.DETAIL_PRODUCT;
+  static const DETAIL_PRODUCT_WITH_ID = _Paths.DETAIL_PRODUCT_WITH_ID;
   static const ADD_CLIENT = _Paths.ADD_CLIENT;
   static const ADD_ORDER = _Paths.ADD_ORDER;
   static const ADD_PRODUCT = _Paths.ADD_PRODUCT;
@@ -38,6 +39,11 @@ abstract class Routes {
   static const SUPPLIER_LIST = _Paths.SUPPLIER_LIST;
   static const SUPPLIER_ORDER = _Paths.SUPPLIER_ORDER;
   static const TRACKING_ORDER = _Paths.TRACKING_ORDER;
+  static const SUPPLIER_ORDERS_FOR_SUPPLIER =
+      _Paths.SUPPLIER_ORDERS_FOR_SUPPLIER;
+  static const DETAIL_SUPPLIER_ORDER = _Paths.DETAIL_SUPPLIER_ORDER;
+  static const LIST_SALE = _Paths.LIST_SALE;
+  static const DETAIL_SALE = _Paths.DETAIL_SALE;
 }
 
 abstract class _Paths {
@@ -47,6 +53,7 @@ abstract class _Paths {
   static const DASHBOARD = '/dashboard';
   static const SIGN_UP = '/sign-up';
   static const DETAIL_PRODUCT = '/detail-product';
+  static const DETAIL_PRODUCT_WITH_ID = '/detail-product-with-id';
   static const ADD_CLIENT = '/add-client';
   static const ADD_ORDER = '/add-order';
   static const ADD_PRODUCT = '/add-product';
@@ -77,4 +84,8 @@ abstract class _Paths {
   static const SUPPLIER_LIST = '/supplier-list';
   static const SUPPLIER_ORDER = '/supplier-order';
   static const TRACKING_ORDER = '/tracking-order';
+  static const SUPPLIER_ORDERS_FOR_SUPPLIER = '/supplier-orders-for-supplier';
+  static const DETAIL_SUPPLIER_ORDER = '/detail-supplier-order';
+  static const LIST_SALE = '/list-sale';
+  static const DETAIL_SALE = '/detail-sale';
 }

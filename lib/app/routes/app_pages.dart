@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+
 import '../modules/AddClient/add_client_binding.dart';
 import '../modules/AddClient/add_client_view.dart';
 import '../modules/AddOrder/add_order_binding.dart';
@@ -11,16 +12,19 @@ import '../modules/Client_List/client_list_binding.dart';
 import '../modules/Client_List/client_list_view.dart';
 import '../modules/Dashboard/dashboard_binding.dart';
 import '../modules/Dashboard/dashboard_view.dart';
-import '../modules/DetailSupplierOrder/detail_supplier_order_binding.dart';
+import '../modules/DetailSale/detail_sale_binding.dart';
+import '../modules/DetailSale/detail_sale_view.dart';
+// import '../modules/DetailSupplierOrder/detail_supplier_order_binding.dart';
+import '../modules/DetailSupplierOrder/detail_supplier_order_controller.dart';
 import '../modules/DetailSupplierOrder/detail_supplier_order_view.dart';
+import '../modules/DetailSupplierOrder/supplier_orders_for_supplier_controller.dart';
+import '../modules/DetailSupplierOrder/supplier_orders_for_supplier_view.dart';
 import '../modules/Detail_Product/detail_product_binding.dart';
 import '../modules/Detail_Product/detail_product_view.dart';
 import '../modules/DetailsClient/details_client_binding.dart';
 import '../modules/DetailsClient/details_client_view.dart';
 import '../modules/DetailsOrder/details_order_binding.dart';
 import '../modules/DetailsOrder/details_order_view.dart';
-import '../modules/DetailsProducts/details_products_binding.dart';
-import '../modules/DetailsProducts/details_products_view.dart';
 import '../modules/DetailsReturn/details_return_binding.dart';
 import '../modules/DetailsReturn/details_return_view.dart';
 import '../modules/DetailsSupplier/details_supplier_binding.dart';
@@ -33,6 +37,8 @@ import '../modules/History/history_binding.dart';
 import '../modules/History/history_view.dart';
 import '../modules/Iventory/iventory_binding.dart';
 import '../modules/Iventory/iventory_view.dart';
+import '../modules/ListSale/list_sale_binding.dart';
+import '../modules/ListSale/list_sale_view.dart';
 import '../modules/ListSupplierOrder/list_supplier_order_binding.dart';
 import '../modules/ListSupplierOrder/list_supplier_order_view.dart';
 import '../modules/Login/login_binding.dart';
@@ -61,10 +67,10 @@ import '../modules/SignUp/sign_up_binding.dart';
 import '../modules/SignUp/sign_up_view.dart';
 import '../modules/Stock/stock_binding.dart';
 import '../modules/Stock/stock_view.dart';
-import '../modules/Supplier_List/supplier_list_binding.dart';
-import '../modules/Supplier_List/supplier_list_view.dart';
 import '../modules/SupplierOrder/supplier_order_binding.dart';
 import '../modules/SupplierOrder/supplier_order_view.dart';
+import '../modules/Supplier_List/supplier_list_binding.dart';
+import '../modules/Supplier_List/supplier_list_view.dart';
 import '../modules/TrackingOrder/tracking_order_binding.dart';
 import '../modules/TrackingOrder/tracking_order_view.dart';
 import '../modules/home/bindings/home_binding.dart';
@@ -78,252 +84,278 @@ class AppPages {
   static const INITIAL = Routes.HOME;
   static const transitionDuration = Duration(milliseconds: 1500);
   static const transitionCurve = Transition.cupertinoDialog;
+  static const SUPPLIER_ORDERS_FOR_SUPPLIER = '/supplier-orders-for-supplier';
+  static const DETAIL_SUPPLIER_ORDER = '/detail-supplier-order';
 
   static final routes = [
     GetPage(
       name: _Paths.HOME,
-      page: () => const HomeView(),
+      page: () => HomeView(),
       binding: HomeBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.LOGIN,
-      page: () =>  LoginView(),
+      page: () => LoginView(),
       binding: LoginBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.DASHBOARD,
-      page: () => const DashboardView(),
+      page: () => DashboardView(),
       binding: DashboardBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.SIGN_UP,
-      page: () => const SignUpView(),
+      page: () => SignUpView(),
       binding: SignUpBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.DETAIL_PRODUCT,
-      page: () => const DetailProductView(),
+      page: () => DetailProductView(),
+      binding: DetailProductBinding(),
+      transition: transitionCurve,
+      transitionDuration: transitionDuration,
+    ),
+    GetPage(
+      name: _Paths.DETAIL_PRODUCT_WITH_ID,
+      page: () => DetailProductView(),
       binding: DetailProductBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.ADD_CLIENT,
-      page: () => const AddClientView(),
+      page: () => AddClientView(),
       binding: AddClientBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.ADD_ORDER,
-      page: () => const AddOrderView(),
+      page: () => AddOrderView(),
       binding: AddOrderBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.ADD_PRODUCT,
-      page: () => const AddProductView(),
+      page: () => AddProductView(),
       binding: AddProductBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.ADD_SUPPLIER,
-      page: () => const AddSupplierView(),
+      page: () => AddSupplierView(),
       binding: AddSupplierBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.CLIENT_LIST,
-      page: () => const ClientListView(),
+      page: () => ClientListView(),
       binding: ClientListBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.DETAILS_CLIENT,
-      page: () => const DetailsClientView(),
+      page: () => DetailsClientView(),
       binding: DetailsClientBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.DETAILS_ORDER,
-      page: () => const DetailsOrderView(),
+      page: () => DetailsOrderView(),
       binding: DetailsOrderBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
-    GetPage(
-      name: _Paths.DETAIL_PRODUCTS,
-      page: () => const DetailsProductsView(),
-      binding: DetailsProductsBinding(),
-      transition: transitionCurve,
-      transitionDuration: transitionDuration,
-    ),
+    // GetPage(
+    //   name: _Paths.DETAIL_PRODUCTS,
+    //   page: () => DetailsProductsView(),
+    //   binding: DetailsProductsBinding(),
+    //   transition: transitionCurve,
+    //   transitionDuration: transitionDuration,
+    // ),
     GetPage(
       name: _Paths.DETAILS_SUPPLIER,
-      page: () => const DetailsSupplierView(),
+      page: () => DetailsSupplierView(),
       binding: DetailsSupplierBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.DETAILS_RETURN,
-      page: () => const DetailsReturnView(),
+      page: () => DetailsReturnView(),
       binding: DetailsReturnBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
-      name: _Paths.DETAILS_SUPPLIER_ORDER,
-      page: () => const DetailSupplierOrderView(),
-      binding: DetailSupplierOrderBinding(),
-      transition: transitionCurve,
-      transitionDuration: transitionDuration,
+      name: Routes.SUPPLIER_ORDERS_FOR_SUPPLIER,
+      page: () => SupplierOrdersForSupplierView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => SupplierOrdersForSupplierController());
+      }),
+    ),
+    GetPage(
+      name: Routes.DETAIL_SUPPLIER_ORDER,
+      page: () => DetailSupplierOrderView(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => DetailSupplierOrderController());
+      }),
     ),
     GetPage(
       name: _Paths.EXPENSE_REPORT,
-      page: () => const ExpenseReportView(),
+      page: () => ExpenseReportView(),
       binding: ExpenseReportBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.FINAL_INVENTORY,
-      page: () => const FinalInventoryView(),
+      page: () => FinalInventoryView(),
       binding: FinalInventoryBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.HISTORY,
-      page: () => const HistoryView(),
+      page: () => HistoryView(),
       binding: HistoryBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.INVENTORY,
-      page: () => const IventoryView(),
+      page: () => IventoryView(),
       binding: IventoryBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.LIST_SUPPLIER_ORDER,
-      page: () => const ListSupplierOrderView(),
+      page: () => ListSupplierOrderView(),
       binding: ListSupplierOrderBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.MANAGEMENT_ORDER,
-      page: () => const ManagementOrderView(),
+      page: () => ManagementOrderView(),
       binding: ManagementOrderBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.MANAGEMENT_ROLE,
-      page: () => const ManagementRoleView(),
+      page: () => ManagementRoleView(),
       binding: ManagementRoleBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.NEWSALE,
-      page: () => const NewsaleView(),
+      page: () => NewsaleView(),
       binding: NewsaleBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.NOTIFICATION,
-      page: () => const NotificationView(),
+      page: () => NotificationView(),
       binding: NotificationBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.ORDER_LIST,
-      page: () => const OrderListView(),
+      page: () => OrderListView(),
       binding: OrderListBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.PRISE_INVENTORY,
-      page: () => const PriseInventoryView(),
+      page: () => PriseInventoryView(),
       binding: PriseInventoryBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.PRODUCT_LIST,
-      page: () => const ProductListView(),
+      page: () => ProductListView(),
       binding: ProductListBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.PROFILE,
-      page: () => const ProfileView(),
+      page: () => ProfileView(),
       binding: ProfileBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.RECEPTION,
-      page: () => const ReceptionView(),
+      page: () => ReceptionView(),
       binding: ReceptionBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.SETTINGS,
-      page: () => const SettingsView(),
+      page: () => SettingsView(),
       binding: SettingsBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.STOCK,
-      page: () => const StockView(),
+      page: () => StockView(),
       binding: StockBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.SUPPLIER_LIST,
-      page: () => const SupplierListView(),
+      page: () => SupplierListView(),
       binding: SupplierListBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.SUPPLIER_ORDER,
-      page: () => const SupplierOrderView(),
+      page: () => SupplierOrderView(),
       binding: SupplierOrderBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
     GetPage(
       name: _Paths.TRACKING_ORDER,
-      page: () => const TrackingOrderView(),
+      page: () => TrackingOrderView(),
       binding: TrackingOrderBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
+    ),
+    GetPage(
+      name: _Paths.LIST_SALE,
+      page: () => const ListSaleView(),
+      binding: ListSaleBinding(),
+    ),
+    GetPage(
+      name: _Paths.DETAIL_SALE,
+      page: () => const DetailSaleView(),
+      binding: DetailSaleBinding(),
     ),
   ];
 }

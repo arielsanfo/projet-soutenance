@@ -7,7 +7,10 @@ import 'package:get/get.dart';
 import 'details_return_controller.dart';
 
 class DetailsReturnView extends GetView<DetailsReturnController> {
-  const DetailsReturnView({super.key});
+   DetailsReturnView({super.key}){
+        Get.lazyPut(() => DetailsReturnView());
+
+  }
 
   @override
   Widget build(BuildContext context) {
