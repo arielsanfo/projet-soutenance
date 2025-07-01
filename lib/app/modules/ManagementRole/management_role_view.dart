@@ -8,7 +8,10 @@ import 'package:get/get.dart';
 import 'management_role_controller.dart';
 
 class ManagementRoleView extends GetView<ManagementRoleController> {
-  const ManagementRoleView({super.key});
+   ManagementRoleView({super.key}){
+        Get.lazyPut(() => ManagementRoleView());
+
+  }
 
   @override
   Widget build(BuildContext context) {

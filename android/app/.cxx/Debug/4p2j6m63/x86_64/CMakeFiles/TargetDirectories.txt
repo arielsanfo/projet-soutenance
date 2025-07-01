@@ -1,0 +1,2 @@
+C:/Users/ARIEL/Desktop/projet-soutenance/android/app/.cxx/Debug/4p2j6m63/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/ARIEL/Desktop/projet-soutenance/android/app/.cxx/Debug/4p2j6m63/x86_64/CMakeFiles/rebuild_cache.dir

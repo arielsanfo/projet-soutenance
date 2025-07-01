@@ -7,7 +7,10 @@ import 'package:get/get.dart';
 import 'management_order_controller.dart';
 
 class ManagementOrderView extends GetView<ManagementOrderController> {
-  const ManagementOrderView({super.key});
+   ManagementOrderView({super.key}){
+        Get.lazyPut(() => ManagementOrderView());
+
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,45 +1,105 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/app/routes/app_pages.dart';
-import 'package:flutter_application_1/helpers/app_constante.dart';
-
 import 'package:get/get.dart';
-
+import '../../../helpers/app_constante.dart';
+import '../../data/storage.dart';
+import '../../routes/app_pages.dart';
 import 'product_list_controller.dart';
 
 class ProductListView extends GetView<ProductListController> {
   ProductListView({super.key}) {
-    Get.lazyPut(() => ProductListController());
+    Get.lazyPut(() => ProductListView());
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        title: Text('Liste des Produits'),
+        elevation: 0,
+        backgroundColor: AppColors.primaryColor,
+        title: Text(
+          'Liste des Produits',
+          style: AppTypography.titleLarge.copyWith(
+            color: AppColors.textOnPrimary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
         actions: [
-          IconButton(
-            icon: Icon(AppIcons.list),
+          Container(
+            margin: EdgeInsets.only(right: AppSpacings.m),
+            decoration: BoxDecoration(
+              color: AppColors.primaryDarker,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: IconButton(
+              icon: Icon(AppIcons.list, color: AppColors.textOnPrimary),
             onPressed: () {
-              Get.toNamed(Routes.DETAILS_PRODUCTS);
-              //
+                // Action pour changer la vue
             },
+            ),
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.all(AppSpacings.l),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: "Rechercher un produit, SKU...",
-                hintStyle: TextStyle(color: AppColors.greyMedium),
-                prefixIcon: Icon(AppIcons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
                 ),
-                contentPadding: EdgeInsets.symmetric(vertical: AppSpacings.s),
-              ),
+                SizedBox(height: AppSpacings.l),
+                Text(
+                  'Chargement des produits...',
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
             ),
+          );
+        }
+
+        return Column(
+        children: [
+            // Barre de recherche
+            Container(
+              margin: EdgeInsets.all(AppSpacings.l),
+              decoration: BoxDecoration(
+                color: AppColors.backgroundWhite,
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.greyLight.withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+            child: TextField(
+                onChanged: controller.onSearchChanged,
+              decoration: InputDecoration(
+                  hintText: "🔍 Rechercher un produit, SKU...",
+                  hintStyle: TextStyle(
+                    color: AppColors.greyMedium,
+                    fontSize: 16,
+                  ),
+                  prefixIcon: Icon(
+                    AppIcons.search,
+                    color: AppColors.primaryColor,
+                    size: 24,
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: AppSpacings.l,
+                    vertical: AppSpacings.m,
+                  ),
+                ),
+              ),
+
           ),
           Expanded(
               child: DefaultTabController(
@@ -91,65 +151,260 @@ class ProductListView extends GetView<ProductListController> {
                         ]),
                       )
                     ],
-                  ))),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
+                  ))
+
+      }),
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primaryColor.withOpacity(0.3),
+              blurRadius: 12,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: FloatingActionButton.extended(
         onPressed: () {
           Get.toNamed(Routes.ADD_PRODUCT);
         },
-        icon: Icon(AppIcons.add),
-        label: Text('Ajouter un Produit'),
+          icon: Icon(AppIcons.add, size: 24),
+          label: Text(
+            'Ajouter un Produit',
+            style: AppTypography.labelLarge.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         backgroundColor: AppColors.primaryColor,
-        foregroundColor: AppColors.backgroundWhite,
+          foregroundColor: AppColors.textOnPrimary,
+          elevation: 0,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            AppIcons.products,
+            size: 80,
+            color: AppColors.greyMedium,
+          ),
+          SizedBox(height: AppSpacings.l),
+          Text(
+            controller.searchQuery.value.isNotEmpty
+                ? 'Aucun produit trouvé'
+                : 'Aucun produit disponible',
+            style: AppTypography.titleMedium.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+          SizedBox(height: AppSpacings.s),
+          Text(
+            controller.searchQuery.value.isNotEmpty
+                ? 'Essayez de modifier vos critères de recherche'
+                : 'Commencez par ajouter votre premier produit',
+            style: AppTypography.bodyMedium.copyWith(
+              color: AppColors.textLight,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildProductCard(Product product) {
-    return Card(
-      margin: EdgeInsets.symmetric(
-        horizontal: AppSpacings.m,
-        vertical: AppSpacings.s,
+    return Container(
+      margin: EdgeInsets.only(bottom: AppSpacings.m),
+      decoration: BoxDecoration(
+        color: AppColors.backgroundWhite,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.greyLight.withOpacity(0.2),
+            blurRadius: 12,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
       child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: _getColorForInitial(product.initial),
+        onTap: () => controller.navigateToProductDetails(product),
+        contentPadding: EdgeInsets.all(AppSpacings.l),
+        leading: Container(
+          width: 60,
+          height: 60,
+          decoration: BoxDecoration(
+            color: _getColorForInitial(controller.getProductInitial(product)),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color:
+                    _getColorForInitial(controller.getProductInitial(product))
+                        .withOpacity(0.3),
+                blurRadius: 8,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Center(
           child: Text(
-            product.initial,
-            style: AppTypography.titleMedium.apply(
+              controller.getProductInitial(product),
+              style: AppTypography.titleMedium.copyWith(
               color: AppColors.textOnPrimary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
-        title: Text(product.name, style: AppTypography.titleSmall),
+        title: Text(
+          product.name ?? 'Sans nom',
+          style: AppTypography.titleSmall.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(product.category),
+            SizedBox(height: AppSpacings.xs),
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: AppSpacings.s,
+                vertical: AppSpacings.xxs,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.primaryLight,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                product.categoryLink.value?.name ?? 'Sans catégorie',
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.primaryColor,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            SizedBox(height: AppSpacings.s),
             Row(
               children: [
-                Text("Stock : ", style: TextStyle(color: AppColors.greyDark)),
-                Text(
-                  product.stock.toString(),
-                  style: TextStyle(
-                    color: product.stock == 0
-                        ? AppColors.errorColor
-                        : product.stock < 10
-                            ? AppColors.tagOrangeText
-                            : AppColors.tagGreenText,
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppSpacings.s,
+                    vertical: AppSpacings.xxs,
+                  ),
+                  decoration: BoxDecoration(
+                    color: controller.getStockColor(product).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    "Stock: ${(product.stockQuantity ?? 0).toString()}",
+                    style: AppTypography.bodySmall.copyWith(
+                      color: controller.getStockColor(product),
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
                 Spacer(),
                 Text(
-                  "Prix : ${product.price}",
-                  style: AppTypography.titleSmall,
+                  "${product.salePrice?.toStringAsFixed(2) ?? 'N/A'} fcfa",
+                  style: AppTypography.titleSmall.copyWith(
+                    color: AppColors.primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),
           ],
         ),
-        trailing: Icon(AppIcons.arrow_forward, size: AppSpacings.xxl),
+        trailing: Container(
+          decoration: BoxDecoration(
+            color: AppColors.greyLight,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: PopupMenuButton<String>(
+            icon: Icon(AppIcons.moreVert,
+                size: 20, color: AppColors.textSecondary),
+            onSelected: (value) {
+              switch (value) {
+                case 'details':
+                  controller.navigateToProductDetails(product);
+                  break;
+                case 'edit':
+                  Get.toNamed(Routes.ADD_PRODUCT, arguments: product);
+                  break;
+                case 'delete':
+                  _showDeleteConfirmation(product);
+                  break;
+              }
+            },
+            itemBuilder: (BuildContext context) => [
+              PopupMenuItem<String>(
+                value: 'details',
+                child: Row(
+                  children: [
+                    Icon(AppIcons.info,
+                        color: AppColors.primaryColor, size: 20),
+                    SizedBox(width: AppSpacings.s),
+                    Text('Afficher les détails'),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'edit',
+                child: Row(
+                  children: [
+                    Icon(AppIcons.edit,
+                        color: AppColors.tagGreenText, size: 20),
+                    SizedBox(width: AppSpacings.s),
+                    Text('Modifier'),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'delete',
+                child: Row(
+                  children: [
+                    Icon(AppIcons.delete,
+                        color: AppColors.errorColor, size: 20),
+                    SizedBox(width: AppSpacings.s),
+                    Text('Supprimer'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showDeleteConfirmation(Product product) {
+    Get.dialog(
+      AlertDialog(
+        title: Text('Confirmer la suppression'),
+        content: Text(
+            'Voulez-vous vraiment supprimer "${product.name}" ? Cette action est irréversible.'),
+        actions: [
+          TextButton(
+            child: Text('Annuler'),
+            onPressed: () => Get.back(),
+          ),
+          TextButton(
+            child: Text('Supprimer', style: TextStyle(color: Colors.red)),
+            onPressed: () async {
+              try {
+                await controller.deleteProduct(product);
+                Get.back(); // Ferme la dialog
+              } catch (e) {
+                Get.back(); // Ferme la dialog
+              }
+            },
+          ),
+        ],
       ),
     );
   }

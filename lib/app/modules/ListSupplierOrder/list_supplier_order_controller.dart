@@ -1,22 +1,28 @@
 import 'package:get/get.dart';
+import 'package:isar/isar.dart';
+import '../../data/storage.dart';
 
 class ListSupplierOrderController extends GetxController {
-  int selectedTabIndex = 0;
-  final count = 0.obs;
+  final supplierOrders = <SupplierOrder>[].obs;
+  final isLoading = false.obs;
+  late final Isar isar;
+
   @override
   void onInit() {
     super.onInit();
+    isar = Get.find<Isar>();
+    loadSupplierOrders();
   }
 
-  @override
-  void onReady() {
-    super.onReady();
+  Future<void> loadSupplierOrders() async {
+    isLoading.value = true;
+    final result =
+        await isar.supplierOrders.where().sortByOrderDateDesc().findAll();
+    supplierOrders.assignAll(result);
+    isLoading.value = false;
   }
 
-  @override
-  void onClose() {
-    super.onClose();
+  void goToDetails(SupplierOrder order) {
+    Get.toNamed('/detail-supplier-order', arguments: order);
   }
-
-  void increment() => count.value++;
 }

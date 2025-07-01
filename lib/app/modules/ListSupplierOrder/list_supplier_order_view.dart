@@ -1,183 +1,119 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/app/routes/app_pages.dart';
 import 'package:flutter_application_1/helpers/app_constante.dart';
-
 import 'package:get/get.dart';
-
+// import '../../helpers/app_constante.dart';
 import 'list_supplier_order_controller.dart';
+import '../../data/storage.dart';
 
 class ListSupplierOrderView extends GetView<ListSupplierOrderController> {
-  const ListSupplierOrderView({super.key});
+  ListSupplierOrderView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundWhite,
+      backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        title: Text('Fiche Fournisseur', style: AppTypography.titleLarge),
+        title: Text('Commandes fournisseurs', style: AppTypography.titleLarge),
         centerTitle: true,
         backgroundColor: AppColors.backgroundWhite,
+        elevation: 0,
       ),
-      body: Column(
-        children: [
-          // Section Informations Générales
-          Padding(
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return Center(child: CircularProgressIndicator());
+        }
+        if (controller.supplierOrders.isEmpty) {
+          return Center(
+              child: Text('Aucune commande fournisseur trouvée',
+                  style: AppTypography.bodyMedium));
+        }
+        return ListView.separated(
             padding: EdgeInsets.all(AppSpacings.l),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundColor: AppColors.primaryColor,
-                  child: Text('BF',
-                      style: AppTypography.titleLarge
-                          .apply(color: AppColors.textOnPrimary)),
-                ),
-                SizedBox(width: AppSpacings.l),
-                Column(
+          itemCount: controller.supplierOrders.length,
+          separatorBuilder: (_, __) => SizedBox(height: AppSpacings.m),
+          itemBuilder: (context, index) {
+            final order = controller.supplierOrders[index];
+            return Card(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+              elevation: 2,
+              child: ListTile(
+                contentPadding: EdgeInsets.all(AppSpacings.l),
+                title: Text('Commande #${order.orderNumber ?? order.id}',
+                    style: AppTypography.titleMedium),
+                subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'BioFrais Distribution',
-                      style: AppTypography.titleMedium,
+                    SizedBox(height: 4),
+                    FutureBuilder<Supplier?>(
+                      future: order.supplierLink.value == null
+                          ? null
+                          : Future.value(order.supplierLink.value),
+                      builder: (context, snapshot) {
+                        final name =
+                            snapshot.data?.name ?? 'Fournisseur inconnu';
+                        return Text(name,
+                            style: AppTypography.bodySmall
+                                .copyWith(color: AppColors.textSecondary));
+                      },
                     ),
-                    SizedBox(height: AppSpacings.s),
+                    SizedBox(height: 4),
                     Text(
-                      'contact@biofrais.com',
-                      style: AppTypography.bodyMedium.apply(
-                        color: AppColors.secondaryColor,
-                      ),
-                    ),
-                    SizedBox(height: AppSpacings.s),
-                    Text(
-                      '04 11 22 33 44',
-                      style: AppTypography.bodyMedium.apply(
-                        color: AppColors.greyDark,
-                      ),
-                    ),
+                        'Date : ${order.orderDate?.toString().split(' ').first ?? ''}',
+                        style: AppTypography.bodySmall),
                   ],
                 ),
-              ],
-            ),
-          ),
-
-          // Barre de Navigation Secondaire
-          Container(
-            decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: AppColors.greyLight)),
-            ),
-            child: Row(
+                trailing: Column(
+                  // mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildTab('Détails', 0),
-                _buildTab('Produits (25)', 1),
-                _buildTab('Commandes (8)', 2),
-              ],
-            ),
-          ),
-
-          // Contenu Scrollable
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(AppSpacings.l),
-              child: Column(
-                children: [
-                  _buildInfoCard(
-                    title: 'Adresse',
-                    content: 'Zone Agroparc, 84000 Avignon',
-                  ),
-                  SizedBox(height: AppSpacings.l),
-                  _buildInfoCard(
-                    title: 'Contact Principal',
-                    content: 'Mme. Sophie Bernard\nResponsable Commerciale',
-                  ),
-                  SizedBox(height: AppSpacings.l),
-                  _buildInfoCard(
-                    title: 'Conditions de paiement',
-                    content: 'Net 30 jours',
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // Bouton Action Principal
-          Container(
-            padding: EdgeInsets.all(AppSpacings.l),
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              icon: Icon(Icons.shopping_cart, color: AppColors.textOnPrimary),
-              label: Text(
-                'Nouvelle Commande',
-                style: AppTypography.bodyLarge.apply(
-                  color: AppColors.textOnPrimary,
+                    Text('${(order.totalPrice ?? 0.0).toStringAsFixed(2)} €',
+                        style: AppTypography.titleSmall
+                            .copyWith(color: AppColors.primaryColor)),
+                    SizedBox(height: 8),
+                    _buildStatusChip(order.status),
+                  ],
                 ),
+                onTap: () => controller.goToDetails(order),
               ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryColor,
-                padding: EdgeInsets.symmetric(vertical: AppSpacings.l),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppSpacings.l),
-                ),
-              ),
-              onPressed: () {},
-            ),
-          ),
-        ],
-      ),
+            );
+          },
+        );
+      }),
     );
   }
 
-  Widget _buildTab(String text, int index) {
-    final isSelected = index == controller.selectedTabIndex;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          Get.toNamed(Routes.DETAILS_SUPPLIER);
-        },
-        //  setState(() => controller.selectedTabIndex = index),
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: AppSpacings.l),
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: isSelected ? AppColors.primaryColor : Colors.transparent,
-                width: 3,
-              ),
-            ),
-          ),
-          child: Text(
-            text,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: isSelected ? AppColors.primaryColor : AppColors.greyMedium,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoCard({required String title, required String content}) {
-    return Card(
-      color: AppColors.greyLight,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSpacings.l),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(AppSpacings.xxxxl),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: AppTypography.bodyMedium.apply(
-                color: AppColors.greyMedium,
-              ),
-            ),
-            SizedBox(height: AppSpacings.l),
-            Text(content, style: AppTypography.bodyMedium),
-          ],
-        ),
-      ),
+  Widget _buildStatusChip(SupplierOrderStatusIsar? status) {
+    String label = 'Inconnu';
+    Color color = Colors.grey;
+    switch (status) {
+      case SupplierOrderStatusIsar.draft:
+        label = 'Brouillon';
+        color = Colors.grey;
+        break;
+      case SupplierOrderStatusIsar.sent:
+        label = 'Envoyée';
+        color = Colors.blue;
+        break;
+      case SupplierOrderStatusIsar.partiallyReceived:
+        label = 'Partielle';
+        color = Colors.orange;
+        break;
+      case SupplierOrderStatusIsar.received:
+        label = 'Réceptionnée';
+        color = Colors.green;
+        break;
+      case SupplierOrderStatusIsar.cancelled:
+        label = 'Annulée';
+        color = Colors.red;
+        break;
+      default:
+        label = 'Inconnu';
+        color = Colors.grey;
+    }
+    return Chip(
+      label: Text(label, style: TextStyle(color: Colors.white)),
+      backgroundColor: color,
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
     );
   }
 }

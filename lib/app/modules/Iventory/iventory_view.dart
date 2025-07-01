@@ -6,7 +6,10 @@ import 'package:get/get.dart';
 import 'iventory_controller.dart';
 
 class IventoryView extends GetView<IventoryController> {
-  const IventoryView({super.key});
+   IventoryView({super.key}){
+        Get.lazyPut(() => IventoryView());
+
+  }
   
   @override
   Widget build(BuildContext context) {

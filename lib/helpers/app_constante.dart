@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 // ignore_for_file: constant_identifier_names
 
@@ -78,6 +79,8 @@ class AppColors {
   static const Color greyLight = Color(0xFFF0F2F5);
   static const Color greyMedium = Color(0xFFA0AEC0);
   static const Color greyDark = Color(0xFF2D3748);
+
+  static const Color successColor = Colors.green;
 }
 
 //----------------------------------------------------------------------------//
@@ -365,9 +368,16 @@ class AppIcons {
   static const IconData swap_horiz = Icons.swap_horiz; // fas fa-leaf
   static const IconData checklist_rtl = Icons.checklist_rtl; // fachecklist_rtls fa-leaf
   static const IconData build = Icons.build; // fachecklist_rtls fa-leaf
-  static const IconData arrow_update = Icons.arrow_upward; // fachecklist_rtls fa-leaf
+  static const IconData arrow_update = Icons.arrow_upward;
 
-
+  // Icônes manquantes ajoutées
+  static const IconData location = Icons.location_on_outlined;
+  static const IconData sales = Icons.point_of_sale_outlined;
+  static const IconData phone = Icons.phone_outlined;
+  static const IconData save = Icons.save_outlined;
+  static const IconData money = Icons.attach_money;
+  static const IconData contact = Icons.contact_phone_outlined;
+  static const IconData business = Icons.business_outlined;
 }
 
 //----------------------------------------------------------------------------//
@@ -422,6 +432,162 @@ class AppConstants {
   static const int itemsPerPage = 20; // Pour la pagination des listes
   static const double defaultAspectRatio = 16 / 9;
   static const int maxImageFileSizeMB = 5; // Limite pour l'upload d'images
+}
+
+//----------------------------------------------------------------------------//
+// UTILITAIRES POUR SNACKBARS ET NOTIFICATIONS
+//----------------------------------------------------------------------------//
+
+class AppSnackbars {
+  /// Afficher un snackbar de succès
+  static void showSuccess(String title, String message) {
+    Get.snackbar(
+      title,
+      message,
+      backgroundColor: AppColors.successColor,
+      colorText: AppColors.textOnPrimary,
+      duration: AppDurations.snackbarDuration,
+      snackPosition: SnackPosition.TOP,
+      margin: EdgeInsets.all(AppSpacings.m),
+      borderRadius: AppRadius.rDefault,
+      icon: Icon(
+        AppIcons.success,
+        color: AppColors.textOnPrimary,
+        size: 24,
+      ),
+    );
+  }
+
+  /// Afficher un snackbar d'erreur
+  static void showError(String title, String message) {
+    Get.snackbar(
+      title,
+      message,
+      backgroundColor: AppColors.errorColor,
+      colorText: AppColors.textOnPrimary,
+      duration: AppDurations.snackbarDuration,
+      snackPosition: SnackPosition.TOP,
+      margin: EdgeInsets.all(AppSpacings.m),
+      borderRadius: AppRadius.rDefault,
+      icon: Icon(
+        AppIcons.error,
+        color: AppColors.textOnPrimary,
+        size: 24,
+      ),
+    );
+  }
+
+  /// Afficher un snackbar d'avertissement
+  static void showWarning(String title, String message) {
+    Get.snackbar(
+      title,
+      message,
+      backgroundColor: AppColors.warningColor,
+      colorText: AppColors.textOnPrimary,
+      duration: AppDurations.snackbarDuration,
+      snackPosition: SnackPosition.TOP,
+      margin: EdgeInsets.all(AppSpacings.m),
+      borderRadius: AppRadius.rDefault,
+      icon: Icon(
+        AppIcons.warningTriangle,
+        color: AppColors.textOnPrimary,
+        size: 24,
+      ),
+    );
+  }
+
+  /// Afficher un snackbar d'information
+  static void showInfo(String title, String message) {
+    Get.snackbar(
+      title,
+      message,
+      backgroundColor: AppColors.primaryColor,
+      colorText: AppColors.textOnPrimary,
+      duration: AppDurations.snackbarDuration,
+      snackPosition: SnackPosition.TOP,
+      margin: EdgeInsets.all(AppSpacings.m),
+      borderRadius: AppRadius.rDefault,
+      icon: Icon(
+        AppIcons.info,
+        color: AppColors.textOnPrimary,
+        size: 24,
+      ),
+    );
+  }
+
+  /// Afficher un snackbar de chargement
+  static void showLoading(String message) {
+    Get.snackbar(
+      'Chargement...',
+      message,
+      backgroundColor: AppColors.primaryColor,
+      colorText: AppColors.textOnPrimary,
+      duration: Duration(seconds: 1),
+      snackPosition: SnackPosition.TOP,
+      margin: EdgeInsets.all(AppSpacings.m),
+      borderRadius: AppRadius.rDefault,
+      icon: SizedBox(
+        width: 20,
+        height: 20,
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          valueColor: AlwaysStoppedAnimation<Color>(AppColors.textOnPrimary),
+        ),
+      ),
+    );
+  }
+}
+
+//----------------------------------------------------------------------------//
+// UTILITAIRES POUR RAFRAÎCHISSEMENT AUTOMATIQUE
+//----------------------------------------------------------------------------//
+
+class AppRefreshManager {
+  static final Map<String, Function> _refreshCallbacks = {};
+
+  /// Enregistrer un callback de rafraîchissement pour une page
+  static void registerRefreshCallback(String pageKey, Function callback) {
+    _refreshCallbacks[pageKey] = callback;
+  }
+
+  /// Supprimer un callback de rafraîchissement
+  static void unregisterRefreshCallback(String pageKey) {
+    _refreshCallbacks.remove(pageKey);
+  }
+
+  /// Déclencher le rafraîchissement d'une page spécifique
+  static void refreshPage(String pageKey) {
+    final callback = _refreshCallbacks[pageKey];
+    if (callback != null) {
+      callback();
+    }
+  }
+
+  /// Déclencher le rafraîchissement de toutes les pages
+  static void refreshAllPages() {
+    for (final callback in _refreshCallbacks.values) {
+      callback();
+    }
+  }
+
+  /// Obtenir la liste des pages enregistrées
+  static List<String> getRegisteredPages() {
+    return _refreshCallbacks.keys.toList();
+  }
+}
+
+//----------------------------------------------------------------------------//
+// CONSTANTES POUR LES CLÉS DE PAGES
+//----------------------------------------------------------------------------//
+
+class AppPageKeys {
+  static const String supplierList = 'supplier_list';
+  static const String clientList = 'client_list';
+  static const String productList = 'product_list';
+  static const String saleList = 'sale_list';
+  static const String orderList = 'order_list';
+  static const String inventory = 'inventory';
+  static const String dashboard = 'dashboard';
 }
 
 // Exemple d'utilisation:
