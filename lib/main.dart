@@ -22,7 +22,7 @@ void main() async {
       SaleItemSchema,
       OrderSchema,
       OrderItemSchema,
-      SupplierSchema,
+      SupplierSchema,   
       SupplierOrderSchema,
       SupplierOrderItemSchema,
       InventoryMovementSchema,

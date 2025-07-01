@@ -11,9 +11,6 @@ class DashboardView extends GetView<DashboardController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Accueil', style: AppTypography.titleLarge),
-      ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(AppSpacings.xxl),
         child: Column(
@@ -65,14 +62,14 @@ class DashboardView extends GetView<DashboardController> {
     final quickActions = [
       {
         'icon': Icons.outbox_rounded,
-        'label': 'nouvelle commande',
+        'label': 'Commande',
         'onTap': () {
           Get.toNamed(Routes.ADD_ORDER);
         },
       },
       {
         'icon': Icons.point_of_sale,
-        'label': 'Nouvelle Vente',
+        'label': 'Vente',
         'onTap': () {
           Get.toNamed(Routes.NEWSALE);
         },
@@ -86,7 +83,7 @@ class DashboardView extends GetView<DashboardController> {
       },
       {
         'icon': Icons.reset_tv,
-        'label': 'gestion des depenses',
+        'label': 'Depenses',
         'onTap': () {
           Get.toNamed(Routes.EXPENSE_REPORT);
         },
@@ -124,7 +121,7 @@ class DashboardView extends GetView<DashboardController> {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
+      crossAxisCount: 3,
       mainAxisSpacing: 12,
       crossAxisSpacing: 12,
       childAspectRatio: 1,
@@ -134,16 +131,16 @@ class DashboardView extends GetView<DashboardController> {
             borderRadius: BorderRadius.circular(12),
             onTap: action['onTap'] as Function(),
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(5),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     action['icon'] as IconData,
-                    size: 32,
+                    size: 25,
                     color: Colors.indigo[400],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 4),
                   Text(
                     action['label'] as String,
                     textAlign: TextAlign.center,

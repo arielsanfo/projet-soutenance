@@ -76,7 +76,7 @@ class AppPages {
   AppPages._();
 
   static const INITIAL = Routes.HOME;
-  static const transitionDuration = Duration(milliseconds: 1500);
+  static const transitionDuration = Duration(milliseconds: 1700);
   static const transitionCurve = Transition.cupertinoDialog;
 
   static final routes = [
@@ -271,7 +271,7 @@ class AppPages {
     ),
     GetPage(
       name: _Paths.PRODUCT_LIST,
-      page: () => const ProductListView(),
+      page: () =>  ProductListView(),
       binding: ProductListBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,

@@ -7,7 +7,9 @@ import 'package:get/get.dart';
 import 'product_list_controller.dart';
 
 class ProductListView extends GetView<ProductListController> {
-  const ProductListView({super.key});
+  ProductListView({super.key}) {
+    Get.lazyPut(() => ProductListController());
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,42 +41,57 @@ class ProductListView extends GetView<ProductListController> {
               ),
             ),
           ),
-          SizedBox(
-            height: AppSpacings.xxxl * 1.5,
-            child: Row(
-              // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Flexible(
-                    child:
-                        _buildTabButton(0, "Tous", controller.products.length)),
-                Flexible(
-                  child: _buildTabButton(
-                    1,
-                    "Stock Bas",
-                    controller.products
-                        .where((p) => p.stock > 0 && p.stock < 10)
-                        .length,
-                  ),
-                ),
-                Flexible(
-                  child: _buildTabButton(
-                    2,
-                    "HorsStock",
-                    controller.products.where((p) => p.stock == 0).length,
-                  ),
-                ),
-              ],
-            ),
-          ),
           Expanded(
-            child: ListView.builder(
-              itemCount: controller.products.length,
-              itemBuilder: (context, index) {
-                final product = controller.products[index];
-                return _buildProductCard(product);
-              },
-            ),
-          ),
+              child: DefaultTabController(
+                  length: 3,
+                  child: Column(
+                    children: [
+                      TabBar(tabs: [
+                        Tab(
+                          text: "Tous (${controller.products.length})",
+                        ),
+                        Tab(
+                          text:
+                              "Stock (${controller.products.where((p) => p.stock > 0 && p.stock < 10).length})",
+                        ),
+                        Tab(
+                          text:
+                              "Rupture (${controller.products.where((p) => p.stock == 0).length})",
+                        )
+                      ]),
+                      Expanded(
+                        child: TabBarView(children: [
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: controller.products.length,
+                              itemBuilder: (context, index) {
+                                final product = controller.products[index];
+                                return _buildProductCard(product);
+                              },
+                            ),
+                          ),
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: controller.products.length,
+                              itemBuilder: (context, index) {
+                                final product = controller.products[index];
+                                return _buildProductCard(product);
+                              },
+                            ),
+                          ),
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: controller.products.length,
+                              itemBuilder: (context, index) {
+                                final product = controller.products[index];
+                                return _buildProductCard(product);
+                              },
+                            ),
+                          ),
+                        ]),
+                      )
+                    ],
+                  ))),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -85,37 +102,6 @@ class ProductListView extends GetView<ProductListController> {
         label: Text('Ajouter un Produit'),
         backgroundColor: AppColors.primaryColor,
         foregroundColor: AppColors.backgroundWhite,
-      ),
-    );
-  }
-
-  Widget _buildTabButton(int index, String label, int count) {
-    return Expanded(
-      child: InkWell(
-        onTap: () {
-          // setState(() {
-          //   _selectedTab = index;
-          // });
-        },
-        child: Column(
-          children: [
-            Text(
-              "$label ($count)",
-              style: TextStyle(
-                fontWeight: controller.selectedTab == index
-                    ? FontWeight.bold
-                    : FontWeight.normal,
-                fontSize: AppTypography.fontSizeSmall,
-                color: controller.selectedTab == index
-                    ? AppColors.primaryColor
-                    : Colors.grey,
-              ),
-            ),
-            SizedBox(height: AppSpacings.xxs),
-            if (controller.selectedTab == index)
-              Container(height: AppSpacings.m, color: AppColors.secondaryColor),
-          ],
-        ),
       ),
     );
   }
@@ -181,5 +167,3 @@ class ProductListView extends GetView<ProductListController> {
     return colors[initial.codeUnitAt(0) % colors.length];
   }
 }
-
-
