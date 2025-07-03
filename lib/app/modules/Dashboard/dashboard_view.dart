@@ -245,7 +245,6 @@ class DashboardView extends GetView<DashboardController> {
             borderRadius: BorderRadius.circular(16),
             onTap: action['onTap'] as Function(),
             child: Padding(
-              padding: const EdgeInsets.all(5),
               padding: EdgeInsets.all(AppSpacings.l),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

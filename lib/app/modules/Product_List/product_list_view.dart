@@ -34,9 +34,9 @@ class ProductListView extends GetView<ProductListController> {
             ),
             child: IconButton(
               icon: Icon(AppIcons.list, color: AppColors.textOnPrimary),
-            onPressed: () {
+              onPressed: () {
                 // Action pour changer la vue
-            },
+              },
             ),
           ),
         ],
@@ -63,43 +63,41 @@ class ProductListView extends GetView<ProductListController> {
           );
         }
 
-        return Column(
-        children: [
-            // Barre de recherche
-            Container(
-              margin: EdgeInsets.all(AppSpacings.l),
-              decoration: BoxDecoration(
-                color: AppColors.backgroundWhite,
-                borderRadius: BorderRadius.circular(15),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.greyLight.withOpacity(0.3),
-                    blurRadius: 10,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
+        return Column(children: [
+          // Barre de recherche
+          Container(
+            margin: EdgeInsets.all(AppSpacings.l),
+            decoration: BoxDecoration(
+              color: AppColors.backgroundWhite,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.greyLight.withOpacity(0.3),
+                  blurRadius: 10,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
             child: TextField(
-                onChanged: controller.onSearchChanged,
+              onChanged: controller.onSearchChanged,
               decoration: InputDecoration(
-                  hintText: "🔍 Rechercher un produit, SKU...",
-                  hintStyle: TextStyle(
-                    color: AppColors.greyMedium,
-                    fontSize: 16,
-                  ),
-                  prefixIcon: Icon(
-                    AppIcons.search,
-                    color: AppColors.primaryColor,
-                    size: 24,
-                  ),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: AppSpacings.l,
-                    vertical: AppSpacings.m,
-                  ),
+                hintText: "🔍 Rechercher un produit, SKU...",
+                hintStyle: TextStyle(
+                  color: AppColors.greyMedium,
+                  fontSize: 16,
+                ),
+                prefixIcon: Icon(
+                  AppIcons.search,
+                  color: AppColors.primaryColor,
+                  size: 24,
+                ),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: AppSpacings.l,
+                  vertical: AppSpacings.m,
                 ),
               ),
-
+            ),
           ),
           Expanded(
               child: DefaultTabController(
@@ -108,15 +106,13 @@ class ProductListView extends GetView<ProductListController> {
                     children: [
                       TabBar(tabs: [
                         Tab(
-                          text: "Tous (${controller.products.length})",
+                          text: "Tous (${controller.totalProducts})",
                         ),
                         Tab(
-                          text:
-                              "Stock (${controller.products.where((p) => p.stock > 0 && p.stock < 10).length})",
+                          text: "Stock (${controller.lowStockProducts})",
                         ),
                         Tab(
-                          text:
-                              "Rupture (${controller.products.where((p) => p.stock == 0).length})",
+                          text: "Rupture (${controller.outOfStockProducts})",
                         )
                       ]),
                       Expanded(
@@ -151,8 +147,8 @@ class ProductListView extends GetView<ProductListController> {
                         ]),
                       )
                     ],
-                  ))
-
+                  )))
+        ]);
       }),
       floatingActionButton: Container(
         decoration: BoxDecoration(
@@ -166,9 +162,9 @@ class ProductListView extends GetView<ProductListController> {
           ],
         ),
         child: FloatingActionButton.extended(
-        onPressed: () {
-          Get.toNamed(Routes.ADD_PRODUCT);
-        },
+          onPressed: () {
+            Get.toNamed(Routes.ADD_PRODUCT);
+          },
           icon: Icon(AppIcons.add, size: 24),
           label: Text(
             'Ajouter un Produit',
@@ -176,7 +172,7 @@ class ProductListView extends GetView<ProductListController> {
               fontWeight: FontWeight.w600,
             ),
           ),
-        backgroundColor: AppColors.primaryColor,
+          backgroundColor: AppColors.primaryColor,
           foregroundColor: AppColors.textOnPrimary,
           elevation: 0,
         ),
@@ -252,10 +248,10 @@ class ProductListView extends GetView<ProductListController> {
             ],
           ),
           child: Center(
-          child: Text(
+            child: Text(
               controller.getProductInitial(product),
               style: AppTypography.titleMedium.copyWith(
-              color: AppColors.textOnPrimary,
+                color: AppColors.textOnPrimary,
                 fontWeight: FontWeight.bold,
               ),
             ),
