@@ -6,9 +6,7 @@ import 'package:get/get.dart';
 import 'add_product_controller.dart';
 
 class AddProductView extends GetView<AddProductController> {
-  AddProductView({super.key}) {
-    Get.lazyPut(() => AddProductController());
-  }
+  AddProductView({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -148,55 +146,58 @@ class AddProductView extends GetView<AddProductController> {
 
   Widget _buildCategorySelector() {
     return GetBuilder<AddProductController>(
-      builder: (controller) => Container(
-        decoration: BoxDecoration(
-          color: AppColors.backgroundWhite,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.greyLight.withOpacity(0.2),
-              blurRadius: 8,
-              offset: Offset(0, 2),
-            ),
-          ],
-        ),
-        child: DropdownButtonFormField<String>(
-          value: controller.selectedCategory,
-          decoration: InputDecoration(
-            labelText: 'Catégorie',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            filled: true,
-            fillColor: AppColors.backgroundWhite,
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: AppSpacings.l,
-              vertical: AppSpacings.m,
-            ),
-            labelStyle: TextStyle(
-              color: AppColors.textSecondary,
-              fontWeight: FontWeight.w500,
-            ),
+      builder: (controller) {
+        // Initialiser la catégorie sélectionnée si null
+        if (controller.selectedCategory == null && controller.categories.isNotEmpty) {
+          controller.setSelectedCategory(controller.categories.first);
+        }
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.backgroundWhite,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.greyLight.withOpacity(0.2),
+                blurRadius: 8,
+                offset: Offset(0, 2),
+              ),
+            ],
           ),
-          items: [
-            DropdownMenuItem(value: null, child: Text('Sélectionner une catégorie')),
-            ...controller.categories.map((category) => DropdownMenuItem(
+          child: DropdownButtonFormField<String>(
+            value: controller.selectedCategory,
+            decoration: InputDecoration(
+              labelText: 'Catégorie',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              filled: true,
+              fillColor: AppColors.backgroundWhite,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: AppSpacings.l,
+                vertical: AppSpacings.m,
+              ),
+              labelStyle: TextStyle(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            items: controller.categories.map((category) => DropdownMenuItem(
               value: category,
               child: Text(category),
             )).toList(),
-          ],
-          onChanged: (value) {
-            controller.setSelectedCategory(value);
-          },
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Veuillez sélectionner une catégorie';
-            }
-            return null;
-          },
-        ),
-      ),
+            onChanged: (value) {
+              controller.setSelectedCategory(value);
+            },
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Veuillez sélectionner une catégorie';
+              }
+              return null;
+            },
+          ),
+        );
+      },
     );
   }
 

@@ -5,8 +5,6 @@ import 'add_product_controller.dart';
 class AddProductBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<AddProductController>(
-      () => AddProductController(),
-    );
+    Get.put<AddProductController>(AddProductController());
   }
 }

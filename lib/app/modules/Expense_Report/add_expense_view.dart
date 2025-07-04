@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'expense_report_controller.dart';
 import 'package:flutter_application_1/helpers/app_constante.dart';
+import '../../data/storage.dart';
 
 class AddExpenseView extends StatelessWidget {
   AddExpenseView({Key? key}) : super(key: key);
@@ -116,15 +117,15 @@ class AddExpenseView extends StatelessWidget {
                         elevation: 2,
                         shadowColor: AppColors.primaryColor.withOpacity(0.12),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           final controller = Get.find<ExpenseReportController>();
-                          controller.addExpense(
+                          await controller.addExpense(
                             Expense(
-                              name: _nameController.text.trim(),
+                              description: _nameController.text.trim(),
                               amount: double.parse(_amountController.text.trim()),
                               category: _selectedCategory!,
-                              date: DateTime.now(),
+                              expenseDate: DateTime.now(),
                             ),
                           );
                           Get.back();

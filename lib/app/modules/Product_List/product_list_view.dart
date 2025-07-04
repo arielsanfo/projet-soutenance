@@ -116,35 +116,70 @@ class ProductListView extends GetView<ProductListController> {
                         )
                       ]),
                       Expanded(
-                        child: TabBarView(children: [
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: controller.products.length,
+                        child: TabBarView(
+                          children: [
+                            // Tous
+                            Obx(() => ListView.builder(
+                              itemCount: controller.filteredProducts.length,
                               itemBuilder: (context, index) {
-                                final product = controller.products[index];
+                                final product = controller.filteredProducts[index];
                                 return _buildProductCard(product);
                               },
-                            ),
-                          ),
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: controller.products.length,
-                              itemBuilder: (context, index) {
-                                final product = controller.products[index];
-                                return _buildProductCard(product);
-                              },
-                            ),
-                          ),
-                          Expanded(
-                            child: ListView.builder(
-                              itemCount: controller.products.length,
-                              itemBuilder: (context, index) {
-                                final product = controller.products[index];
-                                return _buildProductCard(product);
-                              },
-                            ),
-                          ),
-                        ]),
+                            )),
+                            // Stock bas
+                            Obx(() {
+                              final lowStockProducts = controller.filteredProducts.where((p) => (p.stockQuantity ?? 0) >= 1 && (p.stockQuantity ?? 0) < 10).toList();
+                              if (lowStockProducts.isEmpty) {
+                                return Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(32.0),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.info_outline, color: Colors.orange, size: 48),
+                                        SizedBox(height: 12),
+                                        Text('Aucun produit en stock bas.', style: AppTypography.titleMedium.copyWith(color: Colors.orange)),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }
+                              return ListView.builder(
+                                itemCount: lowStockProducts.length,
+                                itemBuilder: (context, index) {
+                                  final product = lowStockProducts[index];
+                                  return _buildProductCard(product);
+                                },
+                              );
+                            }),
+                            // Rupture
+                            Obx(() {
+                              final outOfStockProducts = controller.filteredProducts.where((p) => (p.stockQuantity ?? 0) < 1).toList();
+                              if (outOfStockProducts.isEmpty) {
+                                return Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(32.0),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.warning_amber_rounded, color: Colors.red, size: 48),
+                                        SizedBox(height: 12),
+                                        Text('Aucun produit en rupture de stock.', style: AppTypography.titleMedium.copyWith(color: Colors.red)),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }
+                              return ListView.builder(
+                                itemCount: outOfStockProducts.length,
+                                itemBuilder: (context, index) {
+                                  final product = outOfStockProducts[index];
+                                  return _buildProductCard(product, showOutOfStock: true);
+                                },
+                              );
+                            }),
+                          ],
+                        ),
                       )
                     ],
                   )))
@@ -214,166 +249,196 @@ class ProductListView extends GetView<ProductListController> {
     );
   }
 
-  Widget _buildProductCard(Product product) {
+  Widget _buildProductCard(Product product, {bool showOutOfStock = false}) {
     return Container(
-      margin: EdgeInsets.only(bottom: AppSpacings.m),
+      margin: EdgeInsets.symmetric(horizontal: AppSpacings.l, vertical: AppSpacings.s),
+      padding: EdgeInsets.all(AppSpacings.l),
       decoration: BoxDecoration(
-        color: AppColors.backgroundWhite,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.greyLight.withOpacity(0.2),
-            blurRadius: 12,
-            offset: Offset(0, 4),
+            color: AppColors.greyLight.withOpacity(0.15),
+            blurRadius: 8,
+            offset: Offset(0, 2),
           ),
         ],
       ),
-      child: ListTile(
-        onTap: () => controller.navigateToProductDetails(product),
-        contentPadding: EdgeInsets.all(AppSpacings.l),
-        leading: Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            color: _getColorForInitial(controller.getProductInitial(product)),
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color:
-                    _getColorForInitial(controller.getProductInitial(product))
-                        .withOpacity(0.3),
-                blurRadius: 8,
-                offset: Offset(0, 2),
+      child: Stack(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                backgroundColor: AppColors.primaryColor.withOpacity(0.12),
+                child: Text(
+                  controller.getProductInitial(product),
+                  style: TextStyle(
+                    color: AppColors.primaryColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                radius: 28,
+              ),
+              SizedBox(width: AppSpacings.l),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      product.name ?? '-',
+                      style: AppTypography.titleMedium,
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      product.categoryLink.value?.name ?? '-',
+                      style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+                    ),
+                    SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(Icons.inventory_2, size: 16, color: controller.getStockColor(product)),
+                        SizedBox(width: 4),
+                        Text(
+                          'Stock: ${product.stockQuantity ?? 0}',
+                          style: TextStyle(
+                            color: controller.getStockColor(product),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: controller.getStockColor(product).withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            controller.getStockStatus(product),
+                            style: TextStyle(
+                              color: controller.getStockColor(product),
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                        if (showOutOfStock && (product.stockQuantity ?? 0) == 0) ...[
+                          SizedBox(width: 12),
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.red.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.warning, color: Colors.red, size: 16),
+                                SizedBox(width: 4),
+                                Text('Stock épuisé !', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-          child: Center(
-            child: Text(
-              controller.getProductInitial(product),
-              style: AppTypography.titleMedium.copyWith(
-                color: AppColors.textOnPrimary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-        title: Text(
-          product.name ?? 'Sans nom',
-          style: AppTypography.titleSmall.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: AppSpacings.xs),
-            Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: AppSpacings.s,
-                vertical: AppSpacings.xxs,
-              ),
-              decoration: BoxDecoration(
-                color: AppColors.primaryLight,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                product.categoryLink.value?.name ?? 'Sans catégorie',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.primaryColor,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            SizedBox(height: AppSpacings.s),
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: AppSpacings.s,
-                    vertical: AppSpacings.xxs,
-                  ),
-                  decoration: BoxDecoration(
-                    color: controller.getStockColor(product).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    "Stock: ${(product.stockQuantity ?? 0).toString()}",
-                    style: AppTypography.bodySmall.copyWith(
-                      color: controller.getStockColor(product),
-                      fontWeight: FontWeight.w500,
+          Positioned(
+            top: 0,
+            right: 0,
+            child: PopupMenuButton<String>(
+              icon: Icon(Icons.more_vert, color: AppColors.primaryColor),
+              onSelected: (value) async {
+                if (value == 'details') {
+                  controller.navigateToProductDetails(product);
+                } else if (value == 'edit') {
+                  await Get.toNamed(Routes.ADD_PRODUCT, arguments: product);
+                  // Rafraîchir la liste après modification
+                  await controller.refreshProducts();
+                } else if (value == 'delete') {
+                  final confirm = await showDialog<bool>(
+                    context: Get.context!,
+                    builder: (ctx) => AlertDialog(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      title: Row(
+                        children: [
+                          Icon(Icons.delete, color: Colors.red),
+                          SizedBox(width: 8),
+                          Text('Supprimer le produit'),
+                        ],
+                      ),
+                      content: Text('Voulez-vous vraiment supprimer ce produit ?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx, false),
+                          child: Text('Annuler'),
+                        ),
+                        ElevatedButton.icon(
+                          icon: Icon(Icons.delete),
+                          onPressed: () => Navigator.pop(ctx, true),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                          ),
+                          label: Text('Supprimer'),
+                        ),
+                      ],
                     ),
+                  );
+                  if (confirm == true) {
+                    await controller.deleteProduct(product);
+                    Get.snackbar(
+                      'Suppression',
+                      'Produit supprimé avec succès',
+                      backgroundColor: Colors.red,
+                      colorText: Colors.white,
+                      icon: Icon(Icons.delete, color: Colors.white),
+                      snackPosition: SnackPosition.BOTTOM,
+                      margin: EdgeInsets.all(10),
+                      borderRadius: 10,
+                    );
+                  }
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'details',
+                  child: Row(
+                    children: [
+                      Icon(Icons.info, color: AppColors.primaryColor, size: 20),
+                      SizedBox(width: 8),
+                      Text('Voir détails'),
+                    ],
                   ),
                 ),
-                Spacer(),
-                Text(
-                  "${product.salePrice?.toStringAsFixed(2) ?? 'N/A'} fcfa",
-                  style: AppTypography.titleSmall.copyWith(
-                    color: AppColors.primaryColor,
-                    fontWeight: FontWeight.bold,
+                PopupMenuItem(
+                  value: 'edit',
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit, color: AppColors.tagGreenText, size: 20),
+                      SizedBox(width: 8),
+                      Text('Modifier'),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete, color: Colors.red, size: 20),
+                      SizedBox(width: 8),
+                      Text('Supprimer'),
+                    ],
                   ),
                 ),
               ],
             ),
-          ],
-        ),
-        trailing: Container(
-          decoration: BoxDecoration(
-            color: AppColors.greyLight,
-            borderRadius: BorderRadius.circular(8),
           ),
-          child: PopupMenuButton<String>(
-            icon: Icon(AppIcons.moreVert,
-                size: 20, color: AppColors.textSecondary),
-            onSelected: (value) {
-              switch (value) {
-                case 'details':
-                  controller.navigateToProductDetails(product);
-                  break;
-                case 'edit':
-                  Get.toNamed(Routes.ADD_PRODUCT, arguments: product);
-                  break;
-                case 'delete':
-                  _showDeleteConfirmation(product);
-                  break;
-              }
-            },
-            itemBuilder: (BuildContext context) => [
-              PopupMenuItem<String>(
-                value: 'details',
-                child: Row(
-                  children: [
-                    Icon(AppIcons.info,
-                        color: AppColors.primaryColor, size: 20),
-                    SizedBox(width: AppSpacings.s),
-                    Text('Afficher les détails'),
-                  ],
-                ),
-              ),
-              PopupMenuItem<String>(
-                value: 'edit',
-                child: Row(
-                  children: [
-                    Icon(AppIcons.edit,
-                        color: AppColors.tagGreenText, size: 20),
-                    SizedBox(width: AppSpacings.s),
-                    Text('Modifier'),
-                  ],
-                ),
-              ),
-              PopupMenuItem<String>(
-                value: 'delete',
-                child: Row(
-                  children: [
-                    Icon(AppIcons.delete,
-                        color: AppColors.errorColor, size: 20),
-                    SizedBox(width: AppSpacings.s),
-                    Text('Supprimer'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
+        ],
       ),
     );
   }

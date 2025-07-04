@@ -73,8 +73,13 @@ class AddProductController extends GetxController {
       }
 
       if (productToEdit!.categoryLink.value != null) {
-        categoryController.text = productToEdit!.categoryLink.value!.name ?? '';
-        selectedCategory = productToEdit!.categoryLink.value!.name;
+        final catName = productToEdit!.categoryLink.value!.name ?? '';
+        categoryController.text = catName;
+        selectedCategory = catName;
+        // Ajoute la catégorie si elle n'est pas déjà dans la liste
+        if (!categories.contains(catName)) {
+          categories.insert(0, catName);
+        }
       }
 
       update(); // Déclencher la reconstruction des widgets
@@ -84,12 +89,35 @@ class AddProductController extends GetxController {
   Future<void> saveProduct() async {
     if (formKey.currentState!.validate()) {
       try {
-        final name = nameController.text;
+        final name = nameController.text.trim();
         final description = descriptionController.text;
         final price = double.tryParse(priceController.text) ?? 0.0;
         final stock = int.tryParse(stockController.text) ?? 0;
         final categoryName = selectedCategory ?? categoryController.text;
-        final sku = skuController.text;
+        final sku = skuController.text.trim();
+
+        // Vérification des doublons (nom ou SKU)
+        final existingProducts = await isar.products
+            .filter()
+            .group((q) => q
+                .nameEqualTo(name, caseSensitive: false)
+                .or()
+                .skuEqualTo(sku.isNotEmpty ? sku : '', caseSensitive: false))
+            .findAll();
+        if (!isEditing && existingProducts.isNotEmpty) {
+          Get.snackbar(
+            'Doublon',
+            'Un produit avec ce nom ou ce SKU existe déjà.',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+            duration: Duration(seconds: 4),
+            icon: Icon(Icons.error, color: Colors.white),
+            margin: EdgeInsets.all(10),
+            borderRadius: 10,
+          );
+          return;
+        }
 
         Id? categoryId;
         if (categoryName.isNotEmpty) {
@@ -187,6 +215,7 @@ class AddProductController extends GetxController {
           margin: EdgeInsets.all(10),
           borderRadius: 10,
         );
+        print(e);
       }
     }
   }

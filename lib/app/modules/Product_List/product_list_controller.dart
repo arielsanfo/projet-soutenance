@@ -19,10 +19,10 @@ class ProductListController extends GetxController {
   // Getters pour les compteurs
   int get totalProducts => products.length;
   int get lowStockProducts => products
-      .where((p) => (p.stockQuantity ?? 0) > 0 && (p.stockQuantity ?? 0) < 10)
+      .where((p) => (p.stockQuantity ?? 0) >= 1 && (p.stockQuantity ?? 0) < 10)
       .length;
   int get outOfStockProducts =>
-      products.where((p) => (p.stockQuantity ?? 0) == 0).length;
+      products.where((p) => (p.stockQuantity ?? 0) < 1).length;
 
   @override
   void onInit() {
@@ -91,12 +91,11 @@ class ProductListController extends GetxController {
     switch (selectedTab.value) {
       case 1: // Stock Bas
         filtered = filtered
-            .where((p) =>
-                (p.stockQuantity ?? 0) > 0 && (p.stockQuantity ?? 0) < 10)
+            .where((p) => (p.stockQuantity ?? 0) >= 1 && (p.stockQuantity ?? 0) < 10)
             .toList();
         break;
-      case 2: // Hors Stock
-        filtered = filtered.where((p) => (p.stockQuantity ?? 0) == 0).toList();
+      case 2: // Rupture
+        filtered = filtered.where((p) => (p.stockQuantity ?? 0) < 1).toList();
         break;
       default: // Tous (case 0)
         break;
@@ -119,14 +118,14 @@ class ProductListController extends GetxController {
 
   Color getStockColor(Product product) {
     final stock = product.stockQuantity ?? 0;
-    if (stock == 0) return Colors.red;
+    if (stock < 1) return Colors.red;
     if (stock < 10) return Colors.orange;
     return Colors.green;
   }
 
   String getStockStatus(Product product) {
     final stock = product.stockQuantity ?? 0;
-    if (stock == 0) return 'Hors Stock';
+    if (stock < 1) return 'Hors Stock';
     if (stock < 10) return 'Stock Bas';
     return 'En Stock';
   }

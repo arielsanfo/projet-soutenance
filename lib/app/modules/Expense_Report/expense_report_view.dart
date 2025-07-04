@@ -6,6 +6,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
+import '../../data/storage.dart';
 
 // Widget filtre période
 class _PeriodFilter extends StatelessWidget {
@@ -93,10 +94,10 @@ Future<void> _exportPdf(BuildContext context, ExpenseReportController controller
           pw.Table.fromTextArray(
             headers: ['Nom', 'Catégorie', 'Date', 'Montant'],
             data: expenses.map((e) => [
-              e.name,
-              e.category,
-              '${e.date.day}/${e.date.month}/${e.date.year}',
-              '${e.amount.toStringAsFixed(2)} FCFA',
+              e.description ?? '',
+              e.category ?? '',
+              e.expenseDate != null ? '${e.expenseDate!.day}/${e.expenseDate!.month}/${e.expenseDate!.year}' : '',
+              '${(e.amount ?? 0).toStringAsFixed(2)} FCFA',
             ]).toList(),
           ),
         ],
@@ -107,9 +108,7 @@ Future<void> _exportPdf(BuildContext context, ExpenseReportController controller
 }
 
 class ExpenseReportView extends GetView<ExpenseReportController> {
-  ExpenseReportView({super.key}) {
-    Get.lazyPut(() => ExpenseReportController());
-  }
+  ExpenseReportView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -136,21 +135,7 @@ class ExpenseReportView extends GetView<ExpenseReportController> {
                     selectedYear: controller.selectedYear.value,
                     onChanged: (m, y) => controller.setPeriod(m, y),
                   ),
-                  ElevatedButton.icon(
-                    icon: Icon(Icons.picture_as_pdf, color: Colors.redAccent),
-                    label: Text('Exporter PDF'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: AppColors.primaryColor,
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      side: BorderSide(color: AppColors.primaryColor, width: 1.2),
-                      shadowColor: AppColors.primaryColor.withOpacity(0.12),
-                    ),
-                    onPressed: () async {
-                      await _exportPdf(context, controller);
-                    },
-                  ),
+                  // Le bouton PDF est déplacé en bas
                 ],
               ),
               SizedBox(height: AppSpacings.l),
@@ -257,23 +242,28 @@ class ExpenseReportView extends GetView<ExpenseReportController> {
                                           children: [
                                             Icon(Icons.category, size: 14, color: AppColors.primaryColor),
                                             SizedBox(width: 4),
-                                            Text(expense.category, style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
+                                            Text(expense.category ?? '', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w600)),
                                           ],
                                         ),
                                       ),
                                       SizedBox(width: 10),
                                       Icon(Icons.calendar_today, size: 13, color: AppColors.secondaryColor),
                                       SizedBox(width: 2),
-                                      Text('${expense.date.day}/${expense.date.month}/${expense.date.year}', style: AppTypography.bodySmall.copyWith(color: AppColors.secondaryColor)),
+                                      Text(
+                                        expense.expenseDate != null
+                                            ? '${expense.expenseDate!.day}/${expense.expenseDate!.month}/${expense.expenseDate!.year}'
+                                            : '',
+                                        style: AppTypography.bodySmall.copyWith(color: AppColors.secondaryColor),
+                                      ),
                                     ],
                                   ),
                                   SizedBox(height: 6),
-                                  Text(expense.name, style: AppTypography.titleMedium),
+                                  Text(expense.description ?? '', style: AppTypography.titleMedium),
                                 ],
                               ),
                               Row(
                                 children: [
-                                  Text('${expense.amount.toStringAsFixed(2)} FCFA', style: AppTypography.titleLarge.copyWith(color: AppColors.primaryColor, fontWeight: FontWeight.bold)),
+                                  Text('${expense.amount?.toStringAsFixed(2) ?? ''} FCFA', style: AppTypography.titleLarge.copyWith(color: AppColors.primaryColor, fontWeight: FontWeight.bold)),
                                   SizedBox(width: 6),
                                   Material(
                                     color: Colors.transparent,
@@ -303,7 +293,7 @@ class ExpenseReportView extends GetView<ExpenseReportController> {
                                           ),
                                         );
                                         if (confirm == true) {
-                                          controller.removeExpense(controller.expenses.indexOf(expense));
+                                          await controller.removeExpense(expense);
                                           Get.snackbar('Suppression', 'Dépense supprimée', backgroundColor: AppColors.errorColor, colorText: AppColors.textOnPrimary, icon: Icon(Icons.delete, color: Colors.white));
                                         }
                                       },
@@ -374,7 +364,8 @@ class _ExpenseBarChart extends StatelessWidget {
     // Regrouper les montants par catégorie
     final Map<String, double> data = {};
     for (final e in expenses) {
-      data[e.category] = (data[e.category] ?? 0) + e.amount;
+      final cat = e.category ?? '';
+      data[cat] = (data[cat] ?? 0) + (e.amount ?? 0);
     }
     final categories = data.keys.toList();
     final values = data.values.toList();

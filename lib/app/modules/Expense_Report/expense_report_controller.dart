@@ -1,25 +1,22 @@
 import 'package:get/get.dart';
-
-
-class Expense {
-  final String name;
-  final double amount;
-  final String category;
-  final DateTime date;
-
-  Expense({required this.name, required this.amount, required this.category, required this.date});
-}
+import '../../data/controller/expenseService.dart';
+import '../../data/storage.dart';
 
 class ExpenseReportController extends GetxController {
+  final ExpenseService expenseService;
+  ExpenseReportController(this.expenseService);
+
   final RxList<Expense> expenses = <Expense>[].obs;
 
   // Période sélectionnée
   final RxInt selectedMonth = DateTime.now().month.obs;
   final RxInt selectedYear = DateTime.now().year.obs;
 
-  double get total => filteredExpenses.fold(0.0, (sum, e) => sum + e.amount);
+  double get total => filteredExpenses.fold(0.0, (sum, e) => sum + (e.amount ?? 0));
 
-  List<Expense> get filteredExpenses => expenses.where((e) => e.date.month == selectedMonth.value && e.date.year == selectedYear.value).toList();
+  List<Expense> get filteredExpenses => expenses.where((e) =>
+      (e.expenseDate?.month == selectedMonth.value) &&
+      (e.expenseDate?.year == selectedYear.value)).toList();
 
   void setPeriod(int month, int year) {
     selectedMonth.value = month;
@@ -27,31 +24,27 @@ class ExpenseReportController extends GetxController {
     update();
   }
 
-  void addExpense(Expense expense) {
-    expenses.add(expense);
+  Future<void> loadExpenses() async {
+    final loaded = await expenseService.getAllExpenses();
+    expenses.assignAll(loaded);
     update();
   }
 
-  void removeExpense(int index) {
-    expenses.removeAt(index);
-    update();
+  Future<void> addExpense(Expense expense) async {
+    await expenseService.saveExpense(expense);
+    await loadExpenses();
   }
 
-  final count = 0.obs;
+  Future<void> removeExpense(Expense expense) async {
+    await expenseService.isar.writeTxn(() async {
+      await expenseService.isar.expenses.delete(expense.id!);
+    });
+    await loadExpenses();
+  }
+
   @override
   void onInit() {
     super.onInit();
+    loadExpenses();
   }
-
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
-  void increment() => count.value++;
 }
