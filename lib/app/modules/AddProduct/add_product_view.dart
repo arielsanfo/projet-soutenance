@@ -7,7 +7,7 @@ import 'add_product_controller.dart';
 
 class AddProductView extends GetView<AddProductController> {
   AddProductView({super.key}) {
-    Get.lazyPut(() => AddProductView());
+    Get.lazyPut(() => AddProductController());
   }
   @override
   Widget build(BuildContext context) {
@@ -43,7 +43,6 @@ class AddProductView extends GetView<AddProductController> {
                 controller: controller.nameController,
                 label: 'Nom du produit',
                 hint: 'Ex: Pommes Gala Bio',
-                icon: AppIcons.products,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Veuillez saisir un nom';
@@ -56,7 +55,6 @@ class AddProductView extends GetView<AddProductController> {
                 controller: controller.descriptionController,
                 label: 'Description',
                 hint: 'Décrivez le produit en détail...',
-                icon: AppIcons.info,
                 maxLines: 2,
               ),
               SizedBox(height: AppSpacings.xxl),
@@ -67,9 +65,8 @@ class AddProductView extends GetView<AddProductController> {
                       controller: controller.priceController,
                       label: 'Prix de vente',
                       hint: '0.00',
-                      icon: AppIcons.credit_card,
                       keyboardType: TextInputType.number,
-                      prefix: 'fcfa ',
+                      prefix: 'FCFA ',
                     ),
                   ),
                   SizedBox(width: AppSpacings.l),
@@ -78,25 +75,18 @@ class AddProductView extends GetView<AddProductController> {
                       controller: controller.stockController,
                       label: 'Stock initial',
                       hint: '0',
-                      icon: AppIcons.inventory,
                       keyboardType: TextInputType.number,
                     ),
                   ),
                 ],
               ),
               SizedBox(height: AppSpacings.xxl),
-              _buildFormField(
-                controller: controller.categoryController,
-                label: 'Catégorie',
-                hint: 'Ex: Vêtements, Électronique',
-                icon: AppIcons.category,
-              ),
+              _buildCategorySelector(),
               SizedBox(height: AppSpacings.xxl),
               _buildFormField(
                 controller: controller.skuController,
                 label: 'SKU (Optionnel)',
                 hint: 'Code produit unique',
-                icon: AppIcons.barcode,
               ),
               SizedBox(height: AppSpacings.xxl),
               SizedBox(
@@ -156,6 +146,60 @@ class AddProductView extends GetView<AddProductController> {
     );
   }
 
+  Widget _buildCategorySelector() {
+    return GetBuilder<AddProductController>(
+      builder: (controller) => Container(
+        decoration: BoxDecoration(
+          color: AppColors.backgroundWhite,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.greyLight.withOpacity(0.2),
+              blurRadius: 8,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: DropdownButtonFormField<String>(
+          value: controller.selectedCategory,
+          decoration: InputDecoration(
+            labelText: 'Catégorie',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            filled: true,
+            fillColor: AppColors.backgroundWhite,
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: AppSpacings.l,
+              vertical: AppSpacings.m,
+            ),
+            labelStyle: TextStyle(
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          items: [
+            DropdownMenuItem(value: null, child: Text('Sélectionner une catégorie')),
+            ...controller.categories.map((category) => DropdownMenuItem(
+              value: category,
+              child: Text(category),
+            )).toList(),
+          ],
+          onChanged: (value) {
+            controller.setSelectedCategory(value);
+          },
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Veuillez sélectionner une catégorie';
+            }
+            return null;
+          },
+        ),
+      ),
+    );
+  }
+
   Widget _imageSelection() {
     return Container(
       height: AppSpacings.xxxxl * 4,
@@ -208,13 +252,6 @@ class AddProductView extends GetView<AddProductController> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                // SizedBox(height: AppSpacings.xs),
-                // Text(
-                //   'Tapez pour sélectionner une photo',
-                //   style: AppTypography.bodySmall.copyWith(
-                //     color: AppColors.textLight,
-                //   ),
-                // ),
               ],
             ),
           ),
@@ -227,7 +264,6 @@ class AddProductView extends GetView<AddProductController> {
     required TextEditingController controller,
     required String label,
     required String hint,
-    required IconData icon,
     int? maxLines = 1,
     String? prefix,
     TextInputType? keyboardType,
@@ -254,11 +290,6 @@ class AddProductView extends GetView<AddProductController> {
           labelText: label,
           hintText: hint,
           prefixText: prefix,
-          prefixIcon: Icon(
-            icon,
-            color: AppColors.primaryColor,
-            size: 20,
-          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,

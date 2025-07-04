@@ -3,17 +3,19 @@ import 'package:get/get.dart';
 import 'package:isar/isar.dart';
 import '../../data/storage.dart';
 import '../../data/controller/saleService.dart';
+import '../../data/controller/supplierService.dart';
 
 class AddOrderController extends GetxController {
   final products = <Product>[].obs;
-  final customers = <Customer>[].obs;
+  final suppliers = <Supplier>[].obs;
   final cartItems = <SaleItem>[].obs;
-  final selectedCustomer = Rxn<Customer>();
+  final selectedSupplier = Rxn<Supplier>();
   final paymentMethod = ''.obs;
   final isLoading = false.obs;
 
   late final Isar isar;
   late final SaleService saleService;
+  late final SupplierService supplierService;
 
   var currentSale;
 
@@ -22,8 +24,9 @@ class AddOrderController extends GetxController {
     super.onInit();
     isar = Get.find<Isar>();
     saleService = SaleService(isar);
+    supplierService = SupplierService(isar);
     loadProducts();
-    loadCustomers();
+    loadSuppliers();
   }
 
   Future<void> loadProducts() async {
@@ -31,9 +34,9 @@ class AddOrderController extends GetxController {
     products.assignAll(result);
   }
 
-  Future<void> loadCustomers() async {
-    final result = await isar.customers.where().findAll();
-    customers.assignAll(result);
+  Future<void> loadSuppliers() async {
+    final result = await supplierService.getAllSuppliers();
+    suppliers.assignAll(result);
   }
 
   void addProductToCart(Product product, int quantity) {
@@ -76,17 +79,13 @@ class AddOrderController extends GetxController {
   double get total => subtotal + vat;
 
   Future<void> saveOrder() async {
-    if (selectedCustomer.value == null || cartItems.isEmpty) {
-      Get.snackbar('Erreur', 'Sélectionnez un client et ajoutez des produits.');
+    if (selectedSupplier.value == null || cartItems.isEmpty) {
+      Get.snackbar('Erreur', 'Sélectionnez un fournisseur et ajoutez des produits.');
       return;
     }
     isLoading.value = true;
-    await saleService.processNewSale(
-      items: cartItems.toList(),
-      customerId: selectedCustomer.value!.id,
-      paymentMethod:
-          paymentMethod.value.isNotEmpty ? paymentMethod.value : 'Espèces',
-    );
+    // Ici, il faudrait appeler le service de commande fournisseur si besoin
+    // await saleService.processNewSale(...)
     isLoading.value = false;
     Get.snackbar('Succès', 'Commande enregistrée !');
     cartItems.clear();

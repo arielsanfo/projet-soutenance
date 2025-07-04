@@ -47,7 +47,7 @@ class AddOrderView extends GetView<AddOrderController> {
       ),
       body: Obx(() => Column(
             children: [
-              // Sélection du client
+              // Sélection du fournisseur
               Padding(
                 padding: AppSpacings.screenPadding,
                 child: Card(
@@ -57,31 +57,31 @@ class AddOrderView extends GetView<AddOrderController> {
                   child: Padding(
                     padding: AppSpacings.cardPadding,
                     child: DropdownButtonFormField<int>(
-                      value: controller.selectedCustomer.value?.id,
-                      items: controller.customers
-                          .map((c) => DropdownMenuItem(
-                                value: c.id,
+                      value: controller.selectedSupplier.value?.id,
+                      items: controller.suppliers
+                          .map((s) => DropdownMenuItem(
+                                value: s.id,
                                 child: Row(
                                   children: [
-                                    Icon(AppIcons.person, color: AppColors.primaryColor, size: 20),
+                                    Icon(AppIcons.suppliers, color: AppColors.primaryColor, size: 20),
                                     SizedBox(width: AppSpacings.s),
-                                    Text(c.name ?? '', style: AppTypography.bodyMedium),
+                                    Text(s.name ?? '', style: AppTypography.bodyMedium),
                                   ],
                                 ),
                               ))
                           .toList(),
                       onChanged: (id) {
-                        final customer = controller.customers.firstWhereOrNull((c) => c.id == id);
-                        controller.selectedCustomer.value = customer;
+                        final supplier = controller.suppliers.firstWhereOrNull((s) => s.id == id);
+                        controller.selectedSupplier.value = supplier;
                       },
                       decoration: InputDecoration(
-                        labelText: 'Sélectionner un client',
+                        labelText: 'Sélectionner un fournisseur',
                         labelStyle: AppTypography.bodyMedium.copyWith(color: AppColors.textLight),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.rDefault)),
                         contentPadding: EdgeInsets.symmetric(horizontal: AppSpacings.l, vertical: AppSpacings.m),
                         filled: true,
                         fillColor: AppColors.backgroundInput,
-                        prefixIcon: Icon(AppIcons.customers, color: AppColors.primaryColor),
+                        prefixIcon: Icon(AppIcons.suppliers, color: AppColors.primaryColor),
                       ),
                     ),
                   ),

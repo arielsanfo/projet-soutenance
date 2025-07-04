@@ -21,6 +21,22 @@ class AddProductController extends GetxController {
   Product? productToEdit;
   bool get isEditing => productToEdit != null;
 
+  // Propriétés pour le sélecteur de catégorie
+  String? selectedCategory;
+  List<String> categories = [
+    'Électronique',
+    'Vêtements',
+    'Alimentation',
+    'Maison & Jardin',
+    'Sport & Loisirs',
+    'Livres & Médias',
+    'Beauté & Santé',
+    'Automobile',
+    'Bricolage',
+    'Jouets & Jeux',
+    'Autres'
+  ];
+
   @override
   void onInit() {
     super.onInit();
@@ -33,6 +49,14 @@ class AddProductController extends GetxController {
       productToEdit = arguments;
       _populateFieldsWithProductData();
     }
+  }
+
+  void setSelectedCategory(String? category) {
+    selectedCategory = category;
+    if (category != null) {
+      categoryController.text = category;
+    }
+    update();
   }
 
   void _populateFieldsWithProductData() async {
@@ -50,6 +74,7 @@ class AddProductController extends GetxController {
 
       if (productToEdit!.categoryLink.value != null) {
         categoryController.text = productToEdit!.categoryLink.value!.name ?? '';
+        selectedCategory = productToEdit!.categoryLink.value!.name;
       }
 
       update(); // Déclencher la reconstruction des widgets
@@ -63,7 +88,7 @@ class AddProductController extends GetxController {
         final description = descriptionController.text;
         final price = double.tryParse(priceController.text) ?? 0.0;
         final stock = int.tryParse(stockController.text) ?? 0;
-        final categoryName = categoryController.text;
+        final categoryName = selectedCategory ?? categoryController.text;
         final sku = skuController.text;
 
         Id? categoryId;

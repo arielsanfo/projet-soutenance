@@ -5,6 +5,7 @@ import 'package:isar/isar.dart';
 import '../../../app/data/storage.dart';
 import '../../../app/data/controller/supplierService.dart';
 import '../../../helpers/app_constante.dart';
+import 'package:flutter_application_1/app/routes/app_pages.dart';
 
 class AddSupplierController extends GetxController {
   final formKey = GlobalKey<FormState>();
@@ -21,6 +22,33 @@ class AddSupplierController extends GetxController {
   Supplier? supplierToEdit;
   late final SupplierService supplierService;
 
+  // Propriétés pour le sélecteur de produits
+  List<String> availableProducts = [
+    'Électronique',
+    'Vêtements',
+    'Alimentation',
+    'Maison & Jardin',
+    'Sport & Loisirs',
+    'Livres & Médias',
+    'Beauté & Santé',
+    'Automobile',
+    'Bricolage',
+    'Jouets & Jeux',
+    'Informatique',
+    'Téléphonie',
+    'Meubles',
+    'Décoration',
+    'Outillage',
+    'Textile',
+    'Chaussures',
+    'Accessoires',
+    'Cosmétiques',
+    'Hygiène',
+    'Autres'
+  ];
+  
+  List<String> selectedProducts = [];
+
   @override
   void onInit() {
     super.onInit();
@@ -34,6 +62,15 @@ class AddSupplierController extends GetxController {
       isEditMode.value = true;
       _loadSupplierData();
     }
+  }
+
+  void toggleProduct(String product) {
+    if (selectedProducts.contains(product)) {
+      selectedProducts.remove(product);
+    } else {
+      selectedProducts.add(product);
+    }
+    update();
   }
 
   @override
@@ -64,12 +101,17 @@ class AddSupplierController extends GetxController {
 
     for (final line in lines) {
       if (line.startsWith('Produits:')) {
-        productsController.text = line.replaceFirst('Produits:', '').trim();
+        final productsText = line.replaceFirst('Produits:', '').trim();
+        productsController.text = productsText;
+        
+        // Charger les produits sélectionnés
+        selectedProducts = productsText.split(',').map((p) => p.trim()).where((p) => p.isNotEmpty).toList();
       } else if (line.startsWith('Conditions de paiement:')) {
         paymentController.text =
             line.replaceFirst('Conditions de paiement:', '').trim();
       }
     }
+    update();
   }
 
   /// Sauvegarder le fournisseur (ajout ou modification)
@@ -78,6 +120,15 @@ class AddSupplierController extends GetxController {
       AppSnackbars.showWarning(
         'Validation',
         'Veuillez corriger les erreurs dans le formulaire',
+      );
+      return;
+    }
+
+    // Vérifier qu'au moins un produit est sélectionné
+    if (selectedProducts.isEmpty) {
+      AppSnackbars.showWarning(
+        'Validation',
+        'Veuillez sélectionner au moins un produit',
       );
       return;
     }
@@ -136,8 +187,11 @@ class AddSupplierController extends GetxController {
       // Rafraîchir la liste des fournisseurs
       _refreshSupplierList();
 
+      // Attendre un peu pour que l'utilisateur voie le message de succès
+      await Future.delayed(Duration(seconds: 2));
+
       // Retourner à la liste des fournisseurs
-      Get.back();
+      Get.offAllNamed(Routes.SUPPLIER_LIST);
     } catch (e) {
       AppSnackbars.showError(
         'Erreur',
@@ -166,8 +220,8 @@ class AddSupplierController extends GetxController {
   String _buildNotes() {
     final notes = <String>[];
 
-    if (productsController.text.trim().isNotEmpty) {
-      notes.add('Produits: ${productsController.text.trim()}');
+    if (selectedProducts.isNotEmpty) {
+      notes.add('Produits: ${selectedProducts.join(', ')}');
     }
 
     if (paymentController.text.trim().isNotEmpty) {

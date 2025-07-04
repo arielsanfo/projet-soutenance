@@ -31,6 +31,7 @@ import '../modules/DetailsSupplier/details_supplier_binding.dart';
 import '../modules/DetailsSupplier/details_supplier_view.dart';
 import '../modules/Expense_Report/expense_report_binding.dart';
 import '../modules/Expense_Report/expense_report_view.dart';
+import '../modules/Expense_Report/add_expense_view.dart';
 import '../modules/FinalInventory/final_inventory_binding.dart';
 import '../modules/FinalInventory/final_inventory_view.dart';
 import '../modules/History/history_binding.dart';
@@ -86,6 +87,7 @@ class AppPages {
   static const transitionCurve = Transition.cupertinoDialog;
   static const SUPPLIER_ORDERS_FOR_SUPPLIER = '/supplier-orders-for-supplier';
   static const DETAIL_SUPPLIER_ORDER = '/detail-supplier-order';
+  static const ADD_EXPENSE = '/add-expense';
 
   static final routes = [
     GetPage(
@@ -218,6 +220,13 @@ class AppPages {
       name: _Paths.EXPENSE_REPORT,
       page: () => ExpenseReportView(),
       binding: ExpenseReportBinding(),
+      transition: transitionCurve,
+      transitionDuration: transitionDuration,
+    ),
+    GetPage(
+      name: Routes.ADD_EXPENSE,
+      page: () => AddExpenseView(),
+      binding: AddExpenseBinding(),
       transition: transitionCurve,
       transitionDuration: transitionDuration,
     ),
@@ -358,4 +367,47 @@ class AppPages {
       binding: DetailSaleBinding(),
     ),
   ];
+}
+
+class Routes {
+  static const HOME = '/home';
+  static const LOGIN = '/login';
+  static const DASHBOARD = '/dashboard';
+  static const SIGN_UP = '/sign-up';
+  static const DETAIL_PRODUCT = '/detail-product';
+  static const DETAIL_PRODUCT_WITH_ID = '/detail-product/:id';
+  static const ADD_CLIENT = '/add-client';
+  static const ADD_ORDER = '/add-order';
+  static const ADD_PRODUCT = '/add-product';
+  static const ADD_SUPPLIER = '/add-supplier';
+  static const CLIENT_LIST = '/client-list';
+  static const DETAILS_CLIENT = '/details-client';
+  static const DETAILS_ORDER = '/details-order';
+  static const DETAIL_PRODUCTS = '/detail-products';
+  static const DETAILS_SUPPLIER = '/details-supplier';
+  static const DETAILS_RETURN = '/details-return';
+  static const SUPPLIER_ORDERS_FOR_SUPPLIER = '/supplier-orders-for-supplier';
+  static const DETAIL_SUPPLIER_ORDER = '/detail-supplier-order';
+  static const EXPENSE_REPORT = '/expense-report';
+  static const FINAL_INVENTORY = '/final-inventory';
+  static const HISTORY = '/history';
+  static const INVENTORY = '/inventory';
+  static const LIST_SUPPLIER_ORDER = '/list-supplier-order';
+  static const MANAGEMENT_ORDER = '/management-order';
+  static const MANAGEMENT_ROLE = '/management-role';
+  static const NEWSALE = '/newsale';
+  static const NOTIFICATION = '/notification';
+  static const ORDER_LIST = '/order-list';
+  static const PRISE_INVENTORY = '/prise-inventory';
+  static const PRODUCT_LIST = '/product-list';
+  static const PROFILE = '/profile';
+  static const RECEPTION = '/reception';
+  static const SETTINGS = '/settings';
+  static const STOCK = '/stock';
+  static const SUPPLIER_LIST = '/supplier-list';
+  static const SUPPLIER_ORDER = '/supplier-order';
+  static const TRACKING_ORDER = '/tracking-order';
+  static const LIST_SALE = '/list-sale';
+  static const DETAIL_SALE = '/detail-sale';
+  static const ADD_EXPENSE = '/add-expense';
 }

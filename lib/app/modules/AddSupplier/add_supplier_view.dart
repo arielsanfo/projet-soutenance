@@ -6,7 +6,7 @@ import 'add_supplier_controller.dart';
 
 class AddSupplierView extends GetView<AddSupplierController> {
   AddSupplierView({super.key}) {
-    Get.lazyPut(() => AddSupplierView());
+    Get.lazyPut(() => AddSupplierController());
   }
   @override
   Widget build(BuildContext context) {
@@ -96,7 +96,6 @@ class AddSupplierView extends GetView<AddSupplierController> {
                       _buildTextField(
                         controller: controller.companyController,
                         label: 'Nom de l\'entreprise *',
-                        icon: AppIcons.business,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Le nom de l\'entreprise est obligatoire';
@@ -108,13 +107,11 @@ class AddSupplierView extends GetView<AddSupplierController> {
                       _buildTextField(
                         controller: controller.contactController,
                         label: 'Nom du contact principal',
-                        icon: AppIcons.person,
                       ),
                       SizedBox(height: AppSpacings.m),
                       _buildTextField(
                         controller: controller.emailController,
                         label: 'Email de contact',
-                        icon: AppIcons.email,
                         keyboardType: TextInputType.emailAddress,
                         validator: controller.validateEmail,
                       ),
@@ -122,7 +119,6 @@ class AddSupplierView extends GetView<AddSupplierController> {
                       _buildTextField(
                         controller: controller.phoneController,
                         label: 'Téléphone',
-                        icon: AppIcons.phone,
                         keyboardType: TextInputType.phone,
                         validator: controller.validatePhone,
                       ),
@@ -130,21 +126,14 @@ class AddSupplierView extends GetView<AddSupplierController> {
                       _buildTextField(
                         controller: controller.addressController,
                         label: 'Adresse complète',
-                        icon: AppIcons.location,
                         maxLines: 2,
                       ),
                       SizedBox(height: AppSpacings.m),
-                      _buildTextField(
-                        controller: controller.productsController,
-                        label: 'Produits principaux, notes...',
-                        icon: AppIcons.inventory,
-                        maxLines: 3,
-                      ),
+                      _buildProductSelector(),
                       SizedBox(height: AppSpacings.m),
                       _buildTextField(
                         controller: controller.paymentController,
                         label: 'Conditions de paiement (ex: Net 30)',
-                        icon: AppIcons.payment,
                       ),
                       SizedBox(height: AppSpacings.xxl),
                       Obx(() => _buildSaveButton()),
@@ -159,10 +148,65 @@ class AddSupplierView extends GetView<AddSupplierController> {
     );
   }
 
+  Widget _buildProductSelector() {
+    return GetBuilder<AddSupplierController>(
+      builder: (controller) => Container(
+        decoration: BoxDecoration(
+          color: AppColors.backgroundWhite,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.greyLight.withOpacity(0.2),
+              blurRadius: 8,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(left: AppSpacings.l, top: AppSpacings.m),
+              child: Text(
+                'Produits livrés *',
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.all(AppSpacings.l),
+              child: _MultiSelectDropdown(
+                items: controller.availableProducts,
+                selectedItems: controller.selectedProducts,
+                onChanged: (selected) {
+                  controller.selectedProducts.assignAll(selected);
+                  controller.update();
+                },
+              ),
+            ),
+            if (controller.selectedProducts.isEmpty)
+              Padding(
+                padding: EdgeInsets.only(left: AppSpacings.l, bottom: AppSpacings.m),
+                child: Text(
+                  'Veuillez sélectionner au moins un produit',
+                  style: TextStyle(
+                    color: AppColors.errorColor,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
-    required IconData icon,
     TextInputType keyboardType = TextInputType.text,
     int maxLines = 1,
     String? Function(String?)? validator,
@@ -170,7 +214,7 @@ class AddSupplierView extends GetView<AddSupplierController> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.backgroundWhite,
-        borderRadius: BorderRadius.circular(50.0),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: AppColors.greyLight.withOpacity(0.2),
@@ -187,27 +231,14 @@ class AddSupplierView extends GetView<AddSupplierController> {
         style: AppTypography.bodyMedium,
         decoration: InputDecoration(
           labelText: label,
-          prefixIcon: Container(
-            margin: EdgeInsets.all(AppSpacings.s),
-            padding: EdgeInsets.all(AppSpacings.s),
-            decoration: BoxDecoration(
-              color: AppColors.primaryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(25.0),
-            ),
-            child: Icon(
-              icon,
-              color: AppColors.primaryColor,
-              size: 20,
-            ),
-          ),
           filled: true,
           fillColor: AppColors.backgroundWhite,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50.0),
+            borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(50.0),
+            borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(
               color: AppColors.primaryColor,
               width: 2,
@@ -230,7 +261,7 @@ class AddSupplierView extends GetView<AddSupplierController> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(50.0),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: AppColors.primaryColor.withOpacity(0.3),
@@ -244,11 +275,11 @@ class AddSupplierView extends GetView<AddSupplierController> {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryColor,
           padding: EdgeInsets.symmetric(
-            vertical: AppSpacings.xxxl,
-            horizontal: AppSpacings.xxxl,
+            vertical: AppSpacings.xl,
+            horizontal: AppSpacings.xl,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(50.0),
+            borderRadius: BorderRadius.circular(12),
           ),
           elevation: 0,
         ),
@@ -297,6 +328,93 @@ class AddSupplierView extends GetView<AddSupplierController> {
                 ],
               ),
       ),
+    );
+  }
+}
+
+// Ajout du widget MultiSelectDropdown
+class _MultiSelectDropdown extends StatefulWidget {
+  final List<String> items;
+  final List<String> selectedItems;
+  final ValueChanged<List<String>> onChanged;
+
+  const _MultiSelectDropdown({
+    required this.items,
+    required this.selectedItems,
+    required this.onChanged,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<_MultiSelectDropdown> createState() => _MultiSelectDropdownState();
+}
+
+class _MultiSelectDropdownState extends State<_MultiSelectDropdown> {
+  late List<String> _selected;
+
+  @override
+  void initState() {
+    super.initState();
+    _selected = List<String>.from(widget.selectedItems);
+  }
+
+  @override
+  void didUpdateWidget(covariant _MultiSelectDropdown oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedItems != widget.selectedItems) {
+      _selected = List<String>.from(widget.selectedItems);
+    }
+  }
+
+  void _onItemTapped(String item) {
+    setState(() {
+      if (_selected.contains(item)) {
+        _selected.remove(item);
+      } else {
+        _selected.add(item);
+      }
+      widget.onChanged(_selected);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField<String>(
+      isExpanded: true,
+      value: null,
+      hint: Text(_selected.isEmpty
+          ? 'Sélectionner les produits'
+          : _selected.join(', ')),
+      items: widget.items.map((item) {
+        return DropdownMenuItem<String>(
+          value: item,
+          child: StatefulBuilder(
+            builder: (context, setState) => CheckboxListTile(
+              value: _selected.contains(item),
+              onChanged: (_) => _onItemTapped(item),
+              title: Text(item),
+              controlAffinity: ListTileControlAffinity.leading,
+              contentPadding: EdgeInsets.zero,
+            ),
+          ),
+        );
+      }).toList(),
+      onChanged: (_) {}, // Ne rien faire ici, la sélection se fait dans CheckboxListTile
+      selectedItemBuilder: (context) => widget.items.map((item) => Text('')).toList(),
+      icon: Icon(Icons.arrow_drop_down),
+      decoration: InputDecoration(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        filled: true,
+        fillColor: AppColors.backgroundWhite,
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: AppSpacings.l,
+          vertical: AppSpacings.m,
+        ),
+      ),
+      dropdownColor: AppColors.backgroundWhite,
     );
   }
 }

@@ -104,9 +104,63 @@ class ProfileView extends GetView<ProfileController> {
               SizedBox(height: AppSpacings.xl),
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
+                child: ElevatedButton.icon(
+                  icon: Icon(Icons.logout, color: AppColors.textOnPrimary),
+                  label: Text('Se Déconnecter'),
+                  onPressed: () async {
+                    final userName = controller.currentUser?.name ?? '';
+                    final initials = (userName.isNotEmpty)
+                        ? userName.trim().split(' ').map((e) => e.isNotEmpty ? e[0] : '').take(2).join().toUpperCase()
+                        : '--';
+                    final confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        shape: RoundedRectangleBorder(borderRadius: AppRadius.defaultRadius),
+                        title: Row(
+                          children: [
+                            CircleAvatar(
+                              backgroundColor: AppColors.primaryColor,
+                              child: Text(initials, style: TextStyle(color: AppColors.textOnPrimary, fontWeight: FontWeight.bold)),
+                            ),
+                            SizedBox(width: AppSpacings.m),
+                            Expanded(child: Text('Déconnexion')),
+                          ],
+                        ),
+                        content: Text(
+                          userName.isNotEmpty
+                              ? 'Au revoir $userName !\nVoulez-vous vraiment vous déconnecter ?'
+                              : 'Voulez-vous vraiment vous déconnecter ?',
+                          textAlign: TextAlign.center,
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx, false),
+                            child: Text('Annuler'),
+                          ),
+                          ElevatedButton.icon(
+                            icon: Icon(Icons.logout),
+                            onPressed: () => Navigator.pop(ctx, true),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.tagRedText,
+                              foregroundColor: AppColors.textOnPrimary,
+                            ),
+                            label: Text('Se déconnecter'),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (confirm == true) {
                     controller.logout();
+                      Future.delayed(Duration(milliseconds: 400), () {
+                        Get.snackbar(
+                          'Déconnexion',
+                          'Déconnexion réussie !',
+                          backgroundColor: AppColors.successColor,
+                          colorText: AppColors.textOnPrimary,
+                          snackPosition: SnackPosition.TOP,
+                        );
+                      });
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.tagRedText,
@@ -116,7 +170,6 @@ class ProfileView extends GetView<ProfileController> {
                       borderRadius: AppRadius.defaultRadius,
                     ),
                   ),
-                  child: Text('Se Déconnecter'),
                 ),
               ),
             ],

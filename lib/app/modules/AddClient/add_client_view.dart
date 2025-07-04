@@ -107,7 +107,6 @@ class AddClientView extends GetView<AddClientController> {
                               child: _buildTextField(
                                 controller: controller.firstNameController,
                                 label: 'Prénom',
-                                icon: AppIcons.person,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Veuillez entrer un prénom';
@@ -121,7 +120,6 @@ class AddClientView extends GetView<AddClientController> {
                               child: _buildTextField(
                                 controller: controller.lastNameController,
                                 label: 'Nom',
-                                icon: AppIcons.person,
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Veuillez entrer un nom';
@@ -144,7 +142,6 @@ class AddClientView extends GetView<AddClientController> {
                         _buildTextField(
                           controller: controller.emailController,
                           label: 'Adresse email',
-                          icon: AppIcons.email,
                           keyboardType: TextInputType.emailAddress,
                           validator: (value) {
                             if (value != null &&
@@ -159,7 +156,6 @@ class AddClientView extends GetView<AddClientController> {
                         _buildTextField(
                           controller: controller.phoneController,
                           label: 'Numéro de téléphone',
-                          icon: Icons.phone_outlined,
                           keyboardType: TextInputType.phone,
                         ),
                       ],
@@ -174,7 +170,6 @@ class AddClientView extends GetView<AddClientController> {
                         _buildTextField(
                           controller: controller.addressController,
                           label: 'Adresse complète',
-                          icon: Icons.home_outlined,
                           maxLines: 3,
                         ),
                       ],
@@ -189,7 +184,6 @@ class AddClientView extends GetView<AddClientController> {
                         _buildTextField(
                           controller: controller.notesController,
                           label: 'Notes (facultatif)',
-                          icon: AppIcons.edit,
                           maxLines: 4,
                         ),
                       ],
@@ -347,7 +341,6 @@ class AddClientView extends GetView<AddClientController> {
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
-    required IconData icon,
     TextInputType? keyboardType,
     int maxLines = 1,
     String? Function(String?)? validator,
@@ -362,19 +355,6 @@ class AddClientView extends GetView<AddClientController> {
         labelText: label,
         labelStyle: AppTypography.labelMedium.copyWith(
           color: AppColors.textLight,
-        ),
-        prefixIcon: Container(
-          margin: EdgeInsets.only(right: AppSpacings.m),
-          padding: EdgeInsets.all(AppSpacings.s),
-          decoration: BoxDecoration(
-            color: AppColors.primaryColor.withOpacity(0.1),
-            borderRadius: AppRadius.small,
-          ),
-          child: Icon(
-            icon,
-            color: AppColors.primaryColor,
-            size: 20,
-          ),
         ),
         filled: true,
         fillColor: AppColors.backgroundInput,

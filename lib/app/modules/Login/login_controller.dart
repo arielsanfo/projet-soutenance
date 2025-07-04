@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/app/data/controller/customerService.dart';
 import 'package:flutter_application_1/app/data/controller/userServices.dart';
 import 'package:flutter_application_1/app/data/storage.dart';
-import 'package:flutter_application_1/helpers/app_constante.dart';
+import 'package:flutter_application_1/helpers/globalFuction.dart';
 import 'package:get/get.dart';
 import 'package:isar/isar.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
 import 'package:flutter_application_1/app/routes/app_pages.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginController extends GetxController {
   final formKey = GlobalKey();
@@ -57,64 +58,78 @@ class LoginController extends GetxController {
   Future<void> signInWithGoogle() async {
     try {
       // TODO: Implémenter la connexion Google
-      Get.snackbar(
-        'Connexion Google',
-        'Fonctionnalité en cours de développement',
-        backgroundColor: AppColors.primaryColor,
-        colorText: AppColors.textOnPrimary,
-        duration: Duration(seconds: 2),
-      );
+      _showSnackbar('Connexion Google', 'Fonctionnalité en cours de développement', SNACKBAR_TYPE.WARNING);
     } catch (e) {
-      Get.snackbar(
-        'Erreur',
-        'Erreur lors de la connexion avec Google',
-        backgroundColor: AppColors.errorColor,
-        colorText: AppColors.textOnPrimary,
-      );
+      _showSnackbar('Erreur', 'Erreur lors de la connexion avec Google', SNACKBAR_TYPE.ERROR);
     }
   }
 
   Future<void> signInWithFacebook() async {
     try {
       // TODO: Implémenter la connexion Facebook
-      Get.snackbar(
-        'Connexion Facebook',
-        'Fonctionnalité en cours de développement',
-        backgroundColor: Color(0xFF1877F2),
-        colorText: AppColors.textOnPrimary,
-        duration: Duration(seconds: 2),
-      );
+      _showSnackbar('Connexion Facebook', 'Fonctionnalité en cours de développement', SNACKBAR_TYPE.WARNING);
     } catch (e) {
-      Get.snackbar(
-        'Erreur',
-        'Erreur lors de la connexion avec Facebook',
-        backgroundColor: AppColors.errorColor,
-        colorText: AppColors.textOnPrimary,
-      );
+      _showSnackbar('Erreur', 'Erreur lors de la connexion avec Facebook', SNACKBAR_TYPE.ERROR);
     }
   }
 
   Future<void> login() async {
     final email = emailController.text.trim();
     final password = passwordController.text;
+    
     if (email.isEmpty || password.isEmpty) {
-      Get.snackbar('Erreur', 'Veuillez remplir tous les champs',
-          backgroundColor: AppColors.errorColor);
+      _showSnackbar('Erreur', 'Veuillez remplir tous les champs', SNACKBAR_TYPE.ERROR);
       return;
     }
+    
     final user = await userService.getUserByEmail(email);
     if (user == null) {
-      Get.snackbar('Erreur', 'Aucun utilisateur trouvé avec cet email');
+      _showSnackbar('Erreur', 'Aucun utilisateur trouvé avec cet email', SNACKBAR_TYPE.ERROR);
       return;
     }
+    
     final passwordHash = sha256.convert(utf8.encode(password)).toString();
     if (user.passwordHash != passwordHash) {
-      Get.snackbar('Erreur', 'Mot de passe incorrect');
+      _showSnackbar('Erreur', 'Mot de passe incorrect', SNACKBAR_TYPE.ERROR);
       return;
     }
+    
     // Succès : naviguer vers le dashboard
-    Get.snackbar('Succès', 'Connexion réussie',
-        backgroundColor: AppColors.accentColor);
+    _showSnackbar('Succès', 'Connexion réussie ! Bienvenue ${user.name}', SNACKBAR_TYPE.SUCCESS);
+    
+    // Sauvegarder la session utilisateur
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('is_logged_in', true);
+    
+    // Attendre un peu pour que l'utilisateur voie le message de succès
+    await Future.delayed(Duration(seconds: 1));
+    
     Get.offAllNamed(Routes.DASHBOARD);
+  }
+
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('is_logged_in', false);
+    Get.offAllNamed(Routes.LOGIN);
+  }
+
+  // Méthode pour afficher les snackbars avec le style personnalisé
+  void _showSnackbar(String title, String message, SNACKBAR_TYPE type) {
+    Get.snackbar(
+      title,
+      message,
+      backgroundColor: getSnackbarColor(type),
+      colorText: Colors.white,
+      snackPosition: SnackPosition.TOP,
+      duration: Duration(seconds: 4),
+      margin: EdgeInsets.all(16),
+      borderRadius: 8,
+      icon: Icon(
+        type == SNACKBAR_TYPE.SUCCESS ? Icons.check_circle : 
+        type == SNACKBAR_TYPE.ERROR ? Icons.error : 
+        type == SNACKBAR_TYPE.WARNING ? Icons.warning : Icons.info,
+        color: Colors.white,
+      ),
+    );
   }
 }

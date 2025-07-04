@@ -196,7 +196,7 @@ class AppTypography {
   static const TextStyle labelMedium = TextStyle(
     // Pour les labels de champs, tags
     fontFamily: fontFamily,
-    fontSize: fontSizeXSmall, // 0.75rem pour tags -> 12px
+    fontSize: fontSizeXXSmall, // 0.75rem pour tags -> 12px
     fontWeight: fontWeightMedium,
     color: AppColors.textSecondary,
   );

@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/helpers/app_constante.dart';
 
 import 'package:get/get.dart';
+import '../../data/storage.dart';
 
 import 'sign_up_controller.dart';
 
 class SignUpView extends GetView<SignUpController> {
   SignUpView({super.key}) {
-    Get.lazyPut(() => SignUpView());
+    Get.lazyPut(() => SignUpController());
   }
   @override
   Widget build(BuildContext context) {
@@ -118,6 +119,10 @@ class SignUpView extends GetView<SignUpController> {
                           return null;
                         },
                       ),
+                      SizedBox(height: AppSpacings.l),
+
+                      // Sélecteur de rôle
+                      _buildRoleSelector(),
                       SizedBox(height: AppSpacings.l),
 
                       _buildFormField(
@@ -239,8 +244,8 @@ class SignUpView extends GetView<SignUpController> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primaryColor,
                             padding: EdgeInsets.symmetric(
-                              vertical: AppSpacings.l,
-                              horizontal: AppSpacings.l,
+                              vertical: AppSpacings.m,
+                              horizontal: AppSpacings.m,
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -271,6 +276,141 @@ class SignUpView extends GetView<SignUpController> {
                     ],
                   ),
                 ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRoleSelector() {
+    return GetBuilder<SignUpController>(
+      builder: (controller) => Container(
+        decoration: BoxDecoration(
+          color: AppColors.backgroundWhite,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.greyLight.withOpacity(0.2),
+              blurRadius: 8,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(left: AppSpacings.l, top: AppSpacings.m),
+              child: Text(
+                'Rôle dans l\'entreprise',
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(AppSpacings.l),
+              child: Column(
+                children: [
+                  _buildRoleOption(
+                    UserRoleIsar.employee,
+                    'Employé',
+                    'Accès limité aux fonctionnalités de base',
+                    Icons.person,
+                  ),
+                  SizedBox(height: AppSpacings.s),
+                  _buildRoleOption(
+                    UserRoleIsar.manager,
+                    'Gestionnaire',
+                    'Gestion des équipes et des opérations',
+                    Icons.manage_accounts,
+                  ),
+                  SizedBox(height: AppSpacings.s),
+                  _buildRoleOption(
+                    UserRoleIsar.admin,
+                    'Administrateur',
+                    'Accès complet à toutes les fonctionnalités',
+                    Icons.admin_panel_settings,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRoleOption(UserRoleIsar role, String title, String description, IconData icon) {
+    return GetBuilder<SignUpController>(
+      builder: (controller) => InkWell(
+        onTap: () => controller.setSelectedRole(role),
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: EdgeInsets.all(AppSpacings.m),
+          decoration: BoxDecoration(
+            color: controller.selectedRole == role 
+                ? AppColors.primaryColor.withOpacity(0.1)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: controller.selectedRole == role 
+                  ? AppColors.primaryColor
+                  : AppColors.greyLight,
+              width: 2,
+            ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(AppSpacings.s),
+                decoration: BoxDecoration(
+                  color: controller.selectedRole == role 
+                      ? AppColors.primaryColor
+                      : AppColors.greyLight,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Icon(
+                  icon,
+                  color: controller.selectedRole == role 
+                      ? AppColors.textOnPrimary
+                      : AppColors.textSecondary,
+                  size: 20,
+                ),
+              ),
+              SizedBox(width: AppSpacings.m),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: AppTypography.titleMedium.copyWith(
+                        color: controller.selectedRole == role 
+                            ? AppColors.primaryColor
+                            : AppColors.textPrimary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: AppSpacings.xs),
+                    Text(
+                      description,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (controller.selectedRole == role)
+                Icon(
+                  Icons.check_circle,
+                  color: AppColors.primaryColor,
+                  size: 24,
               ),
             ],
           ),

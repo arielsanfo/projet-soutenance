@@ -8,11 +8,64 @@ import 'dashboard_controller.dart';
 
 class DashboardView extends GetView<DashboardController> {
   DashboardView({super.key}) {
-    Get.lazyPut(() => DashboardView());
+    Get.lazyPut(() => DashboardController());
   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout, color: AppColors.tagRedText),
+            tooltip: 'Déconnexion',
+            onPressed: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  title: Row(
+                    children: [
+                      Icon(Icons.logout, color: AppColors.tagRedText),
+                      SizedBox(width: 12),
+                      Expanded(child: Text('Déconnexion')),
+                    ],
+                  ),
+                  content: Text('Voulez-vous vraiment vous déconnecter ?', textAlign: TextAlign.center),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx, false),
+                      child: Text('Annuler'),
+                    ),
+                    ElevatedButton.icon(
+                      icon: Icon(Icons.logout),
+                      onPressed: () => Navigator.pop(ctx, true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.tagRedText,
+                        foregroundColor: AppColors.textOnPrimary,
+                      ),
+                      label: Text('Se déconnecter'),
+                    ),
+                  ],
+                ),
+              );
+              if (confirm == true) {
+                Get.offAllNamed(Routes.LOGIN);
+                Future.delayed(Duration(milliseconds: 400), () {
+                  Get.snackbar(
+                    'Déconnexion',
+                    'Déconnexion réussie !',
+                    backgroundColor: AppColors.successColor,
+                    colorText: AppColors.textOnPrimary,
+                    snackPosition: SnackPosition.TOP,
+                  );
+                });
+              }
+            },
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(AppSpacings.l),
         child: Column(
@@ -63,91 +116,104 @@ class DashboardView extends GetView<DashboardController> {
   }
 
   Widget _buildSalesCard() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppColors.primaryColor,
-            AppColors.primaryDarker,
+    return InkWell(
+      onTap: () {
+        // Naviguer vers la liste des ventes du jour
+        Get.toNamed(Routes.LIST_SALE, arguments: {'filter': 'today'});
+      },
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppColors.primaryColor,
+              AppColors.primaryDarker,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primaryColor.withOpacity(0.3),
+              blurRadius: 15,
+              offset: Offset(0, 8),
+            ),
           ],
         ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryColor.withOpacity(0.3),
-            blurRadius: 15,
-            offset: Offset(0, 8),
+        child: Padding(
+          padding: EdgeInsets.all(AppSpacings.xl),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(AppSpacings.s),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      AppIcons.chart,
+                      color: AppColors.textOnPrimary,
+                      size: 20,
+                    ),
+                  ),
+                  SizedBox(width: AppSpacings.m),
+                  Text(
+                    'Ventes du jour',
+                    style: AppTypography.titleMedium.copyWith(
+                      color: AppColors.textOnPrimary,
+                    ),
+                  ),
+                  Spacer(),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    color: AppColors.textOnPrimary.withOpacity(0.7),
+                    size: 16,
+                  ),
+                ],
+              ),
+              SizedBox(height: AppSpacings.l),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '12500,75 FCFA',
+                        style: AppTypography.titleLarge.copyWith(
+                          color: AppColors.textOnPrimary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: AppSpacings.xs),
+                      Text(
+                        '+15% par rapport à hier',
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.textOnPrimary.withOpacity(0.8),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(AppSpacings.m),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      AppIcons.chart,
+                      color: AppColors.textOnPrimary,
+                      size: 20,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(AppSpacings.xl),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(AppSpacings.s),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    AppIcons.chart,
-                    color: AppColors.textOnPrimary,
-                    size: 20,
-                  ),
-                ),
-                SizedBox(width: AppSpacings.m),
-                Text(
-                  'Ventes du jour',
-                  style: AppTypography.titleMedium.copyWith(
-                    color: AppColors.textOnPrimary,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: AppSpacings.l),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '12500,75 FCFA',
-                      style: AppTypography.titleLarge.copyWith(
-                        color: AppColors.textOnPrimary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: AppSpacings.xs),
-                    Text(
-                      '+15% par rapport à hier',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppColors.textOnPrimary.withOpacity(0.8),
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  padding: EdgeInsets.all(AppSpacings.m),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    AppIcons.chart,
-                    color: AppColors.textOnPrimary,
-                    size: 20,
-                  ),
-                ),
-              ],
-            ),
-          ],
         ),
       ),
     );
@@ -209,6 +275,14 @@ class DashboardView extends GetView<DashboardController> {
         'color': Colors.indigo.shade500,
         'onTap': () {
           Get.toNamed(Routes.INVENTORY);
+        },
+      },
+      {
+        'icon': AppIcons.debt,
+        'label': 'Dettes',
+        'color': Colors.red.shade500,
+        'onTap': () {
+          Get.toNamed(Routes.MANAGEMENT_ORDER);
         },
       },
       {

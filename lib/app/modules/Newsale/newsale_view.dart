@@ -8,7 +8,7 @@ import 'newsale_controller.dart';
 
 class NewsaleView extends GetView<NewsaleController> {
   NewsaleView({super.key}) {
-        Get.lazyPut(() => NewsaleView());
+    Get.lazyPut(() => NewsaleView());
   }
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,8 @@ class NewsaleView extends GetView<NewsaleController> {
                     shape: BoxShape.circle,
                   ),
                   child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(AppColors.primaryColor),
                     strokeWidth: 3,
                   ),
                 ),
@@ -42,7 +43,8 @@ class NewsaleView extends GetView<NewsaleController> {
             // Header moderne
             Container(
               width: double.infinity,
-              padding: EdgeInsets.fromLTRB(AppSpacings.l, 60, AppSpacings.l, AppSpacings.xxl),
+              padding: EdgeInsets.fromLTRB(
+                  AppSpacings.l, 60, AppSpacings.l, AppSpacings.xxl),
               decoration: BoxDecoration(
                 color: AppColors.backgroundWhite,
                 boxShadow: [
@@ -59,11 +61,15 @@ class NewsaleView extends GetView<NewsaleController> {
                     padding: EdgeInsets.all(AppSpacings.m),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [AppColors.primaryColor, AppColors.primaryDarker],
+                        colors: [
+                          AppColors.primaryColor,
+                          AppColors.primaryDarker
+                        ],
                       ),
                       borderRadius: BorderRadius.circular(50.0),
                     ),
-                    child: Icon(AppIcons.newSale, color: AppColors.textOnPrimary, size: 28),
+                    child: Icon(AppIcons.newSale,
+                        color: AppColors.textOnPrimary, size: 28),
                   ),
                   SizedBox(width: AppSpacings.l),
                   Expanded(
@@ -73,12 +79,14 @@ class NewsaleView extends GetView<NewsaleController> {
                         Text('Nouvelle Vente', style: AppTypography.titleLarge),
                         SizedBox(height: AppSpacings.xs),
                         Text('Enregistrez une nouvelle vente',
-                            style: AppTypography.bodyMedium.copyWith(color: AppColors.textLight)),
+                            style: AppTypography.bodyMedium
+                                .copyWith(color: AppColors.textLight)),
                       ],
                     ),
                   ),
                   IconButton(
-                    icon: Icon(AppIcons.close, color: AppColors.textLight, size: 24),
+                    icon: Icon(AppIcons.close,
+                        color: AppColors.textLight, size: 24),
                     onPressed: () => Get.back(),
                   ),
                 ],
@@ -93,7 +101,8 @@ class NewsaleView extends GetView<NewsaleController> {
                     // Sélection du client
                     Card(
                       elevation: 2,
-                      shape: RoundedRectangleBorder(borderRadius: AppRadius.large),
+                      shape:
+                          RoundedRectangleBorder(borderRadius: AppRadius.large),
                       child: Padding(
                         padding: AppSpacings.cardPadding,
                         child: Column(
@@ -106,14 +115,19 @@ class NewsaleView extends GetView<NewsaleController> {
                               items: controller.customers
                                   .map((c) => DropdownMenuItem(
                                         value: c,
-                                        child: Text(c.name ?? 'Sans nom', style: AppTypography.bodyMedium),
+                                        child: Text(c.name ?? 'Sans nom',
+                                            style: AppTypography.bodyMedium),
                                       ))
                                   .toList(),
-                              onChanged: (value) => controller.selectedCustomer.value = value,
+                              onChanged: (value) =>
+                                  controller.selectedCustomer.value = value,
                               decoration: InputDecoration(
                                 hintText: 'Sélectionner un client',
-                                hintStyle: AppTypography.bodyMedium.copyWith(color: AppColors.textLight),
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.rDefault)),
+                                hintStyle: AppTypography.bodyMedium
+                                    .copyWith(color: AppColors.textLight),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        AppRadius.rDefault)),
                                 filled: true,
                                 fillColor: AppColors.backgroundInput,
                               ),
@@ -126,28 +140,36 @@ class NewsaleView extends GetView<NewsaleController> {
                     // Ajout de produit
                     Card(
                       elevation: 2,
-                      shape: RoundedRectangleBorder(borderRadius: AppRadius.large),
+                      shape:
+                          RoundedRectangleBorder(borderRadius: AppRadius.large),
                       child: Padding(
                         padding: AppSpacings.cardPadding,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Ajouter un produit', style: AppTypography.titleMedium),
+                            Text('Ajouter un produit',
+                                style: AppTypography.titleMedium),
                             SizedBox(height: AppSpacings.s),
                             DropdownButtonFormField(
                               items: controller.products
                                   .map((p) => DropdownMenuItem(
                                         value: p,
-                                        child: Text('${p.name} - ${(p.salePrice ?? 0).toStringAsFixed(2)} f', style: AppTypography.bodyMedium),
+                                        child: Text(
+                                            '${p.name} - ${(p.salePrice ?? 0).toStringAsFixed(2)} f',
+                                            style: AppTypography.bodyMedium),
                                       ))
                                   .toList(),
                               onChanged: (product) {
-                                if (product != null) controller.addProductToCart(product);
+                                if (product != null)
+                                  controller.addProductToCart(product);
                               },
                               decoration: InputDecoration(
                                 hintText: 'Sélectionner un produit',
-                                hintStyle: AppTypography.bodyMedium.copyWith(color: AppColors.textLight),
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.rDefault)),
+                                hintStyle: AppTypography.bodyMedium
+                                    .copyWith(color: AppColors.textLight),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        AppRadius.rDefault)),
                                 filled: true,
                                 fillColor: AppColors.backgroundInput,
                               ),
@@ -156,12 +178,14 @@ class NewsaleView extends GetView<NewsaleController> {
                             Text('Articles', style: AppTypography.titleLarge),
                             SizedBox(height: AppSpacings.s),
                             if (controller.cart.isEmpty)
-                              Text('Aucun article dans le panier.', style: AppTypography.bodyMedium),
+                              Text('Aucun article dans le panier.',
+                                  style: AppTypography.bodyMedium),
                             ListView.separated(
                               physics: NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               itemCount: controller.cart.length,
-                              separatorBuilder: (context, index) => Divider(height: AppSpacings.l),
+                              separatorBuilder: (context, index) =>
+                                  Divider(height: AppSpacings.l),
                               itemBuilder: (context, index) {
                                 final item = controller.cart[index];
                                 return Container(
@@ -178,7 +202,8 @@ class NewsaleView extends GetView<NewsaleController> {
                                   ),
                                   child: ListTile(
                                     contentPadding: EdgeInsets.symmetric(
-                                        vertical: AppSpacings.m, horizontal: AppSpacings.l),
+                                        vertical: AppSpacings.m,
+                                        horizontal: AppSpacings.l),
                                     title: Text(item.product.name ?? '',
                                         style: AppTypography.bodyLarge,
                                         overflow: TextOverflow.ellipsis,
@@ -188,31 +213,46 @@ class NewsaleView extends GetView<NewsaleController> {
                                         style: AppTypography.bodySmall,
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1),
-                                    leading: Icon(AppIcons.cart, color: AppColors.primaryColor),
+                                    leading: Icon(AppIcons.cart,
+                                        color: AppColors.primaryColor),
                                     trailing: SizedBox(
                                       width: 120,
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           IconButton(
-                                            icon: Icon(Icons.remove, color: AppColors.textLight),
+                                            icon: Icon(Icons.remove,
+                                                color: AppColors.textLight),
                                             onPressed: () {
                                               if (item.quantity > 1) {
-                                                controller.updateQuantity(item.product, item.quantity - 1);
+                                                controller.updateQuantity(
+                                                    item.product,
+                                                    item.quantity - 1);
                                               } else {
-                                                controller.removeProductFromCart(item.product);
+                                                controller
+                                                    .removeProductFromCart(
+                                                        item.product);
                                               }
                                             },
                                           ),
                                           Flexible(
-                                              child: Text('${item.quantity}', style: AppTypography.bodyLarge)),
+                                              child: Text('${item.quantity}',
+                                                  style:
+                                                      AppTypography.bodyLarge)),
                                           IconButton(
-                                            icon: Icon(AppIcons.add, color: AppColors.primaryColor),
-                                            onPressed: () => controller.updateQuantity(item.product, item.quantity + 1),
+                                            icon: Icon(AppIcons.add,
+                                                color: AppColors.primaryColor),
+                                            onPressed: () =>
+                                                controller.updateQuantity(
+                                                    item.product,
+                                                    item.quantity + 1),
                                           ),
                                           IconButton(
-                                            icon: Icon(AppIcons.delete, color: AppColors.errorColor),
-                                            onPressed: () => controller.removeProductFromCart(item.product),
+                                            icon: Icon(AppIcons.delete,
+                                                color: AppColors.errorColor),
+                                            onPressed: () => controller
+                                                .removeProductFromCart(
+                                                    item.product),
                                           ),
                                         ],
                                       ),
@@ -229,25 +269,36 @@ class NewsaleView extends GetView<NewsaleController> {
                     // Paiement et remise
                     Card(
                       elevation: 2,
-                      shape: RoundedRectangleBorder(borderRadius: AppRadius.large),
+                      shape:
+                          RoundedRectangleBorder(borderRadius: AppRadius.large),
                       child: Padding(
                         padding: AppSpacings.cardPadding,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Mode de paiement', style: AppTypography.titleMedium),
+                            Text('Mode de paiement',
+                                style: AppTypography.titleMedium),
                             SizedBox(height: AppSpacings.s),
                             DropdownButtonFormField<String>(
-                              value: controller.paymentMethod.value.isEmpty ? null : controller.paymentMethod.value,
+                              value: controller.paymentMethod.value.isEmpty
+                                  ? null
+                                  : controller.paymentMethod.value,
                               items: const [
-                                DropdownMenuItem(value: 'Espèces', child: Text('Espèces')),
-                                DropdownMenuItem(value: 'Carte Bancaire', child: Text('Carte Bancaire')),
-                                DropdownMenuItem(value: 'Mobile Money', child: Text('Mobile Money')),
+                                DropdownMenuItem(
+                                    value: 'Espèces', child: Text('Espèces')),
+                                DropdownMenuItem(
+                                    value: 'Carte Bancaire',
+                                    child: Text('Carte Bancaire')),
+                                DropdownMenuItem(
+                                    value: 'Mobile Money',
+                                    child: Text('Mobile Money')),
                               ],
-                              onChanged: (value) => controller.paymentMethod.value = value ?? '',
+                              onChanged: (value) =>
+                                  controller.paymentMethod.value = value ?? '',
                               decoration: InputDecoration(
-                                hintText: 'Sélectionner un mode de paiement',
-                                hintStyle: AppTypography.bodyMedium.copyWith(color: AppColors.textLight),
+                                hintText: 'Sélectionner un mode ',
+                                hintStyle: AppTypography.bodyMedium
+                                    .copyWith(color: AppColors.textLight),
                                 filled: true,
                                 fillColor: AppColors.backgroundInput,
                               ),
@@ -255,16 +306,21 @@ class NewsaleView extends GetView<NewsaleController> {
                             SizedBox(height: AppSpacings.m),
                             Row(
                               children: [
-                                Text('Remise : ', style: AppTypography.bodyLarge),
+                                Text('Remise : ',
+                                    style: AppTypography.bodyLarge),
                                 SizedBox(width: AppSpacings.s),
                                 Expanded(
                                   child: TextFormField(
-                                    initialValue: controller.discount.value.toString(),
+                                    initialValue:
+                                        controller.discount.value.toString(),
                                     keyboardType: TextInputType.number,
                                     decoration: InputDecoration(
                                       hintText: '0.0',
-                                      hintStyle: AppTypography.bodyMedium.copyWith(color: AppColors.textLight),
-                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.rDefault)),
+                                      hintStyle: AppTypography.bodyMedium
+                                          .copyWith(color: AppColors.textLight),
+                                      border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              AppRadius.rDefault)),
                                       filled: true,
                                       fillColor: AppColors.backgroundInput,
                                     ),
@@ -285,15 +341,17 @@ class NewsaleView extends GetView<NewsaleController> {
                     // Total à payer
                     Card(
                       elevation: 2,
-                      shape: RoundedRectangleBorder(borderRadius: AppRadius.large),
+                      shape:
+                          RoundedRectangleBorder(borderRadius: AppRadius.large),
                       child: Padding(
                         padding: AppSpacings.cardPadding,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Total à payer :', style: AppTypography.titleLarge),
+                            Text('Total à payer :',
+                                style: AppTypography.titleLarge),
                             Obx(() => Text(
-                                  '${controller.total.toStringAsFixed(2)} f',
+                                  '${controller.total.toStringAsFixed(1)} f',
                                   style: AppTypography.titleLarge.copyWith(
                                     color: AppColors.primaryColor,
                                     fontWeight: FontWeight.bold,
@@ -321,7 +379,11 @@ class NewsaleView extends GetView<NewsaleController> {
                   elevation: 2,
                 ),
                 icon: Icon(AppIcons.success),
-                label: Text('Valider la vente', style: AppTypography.titleLarge),
+                label: Text('Valider la vente',
+                    style: AppTypography.titleLarge.copyWith(
+                        color: AppColors.textOnPrimary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16)),
               ),
             ),
           ],

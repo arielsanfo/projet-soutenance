@@ -390,16 +390,18 @@ class ClientCard extends StatelessWidget {
     final avatarColor = colors[name.hashCode % colors.length];
 
     return Card(
-      elevation: 4,
-      shadowColor: Colors.black.withOpacity(0.1),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50.0)),
+      elevation: 2,
+      shadowColor: Colors.black.withOpacity(0.08),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: InkWell(
-        borderRadius: BorderRadius.circular(25.0),
-        onTap: () {},
+        borderRadius: BorderRadius.circular(15),
+        onTap: () {
+          Get.toNamed(Routes.DETAILS_CLIENT, arguments: client);
+        },
         child: Container(
           padding: EdgeInsets.all(AppSpacings.xl),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(50.0),
+            borderRadius: BorderRadius.circular(15),
             color: AppColors.backgroundWhite,
           ),
           child: Row(
@@ -413,9 +415,9 @@ class ClientCard extends StatelessWidget {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: avatarColor.withOpacity(0.3),
-                      blurRadius: 10,
-                      offset: Offset(0, 5),
+                      color: avatarColor.withOpacity(0.18),
+                      blurRadius: 6,
+                      offset: Offset(0, 2),
                     ),
                   ],
                 ),

@@ -4,6 +4,7 @@ import 'package:flutter_application_1/helpers/app_constante.dart';
 import 'package:get/get.dart';
 import '../../../app/data/storage.dart';
 import 'supplier_list_controller.dart';
+import 'package:flutter_application_1/app/routes/app_pages.dart';
 
 class SupplierListView extends GetView<SupplierListController> {
   SupplierListView({super.key});
@@ -365,13 +366,13 @@ class SupplierCard extends StatelessWidget {
     final avatarColor = colors[name.hashCode % colors.length];
 
     return Card(
-      elevation: 4,
-      shadowColor: Colors.black.withOpacity(0.1),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50.0)),
+      elevation: 2,
+      shadowColor: Colors.black.withOpacity(0.08),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: InkWell(
-        borderRadius: BorderRadius.circular(25.0),
+        borderRadius: BorderRadius.circular(15),
         onTap: () async {
-          final result = await Get.toNamed('/details-supplier', arguments: supplier);
+          final result = await Get.toNamed(Routes.DETAILS_SUPPLIER, arguments: supplier);
           if (result == true) {
             Get.snackbar(
               'Succès',
@@ -385,7 +386,7 @@ class SupplierCard extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.all(AppSpacings.xl),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(50.0),
+            borderRadius: BorderRadius.circular(15),
             color: AppColors.backgroundWhite,
           ),
           child: Row(
@@ -399,9 +400,9 @@ class SupplierCard extends StatelessWidget {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: avatarColor.withOpacity(0.3),
-                      blurRadius: 10,
-                      offset: Offset(0, 5),
+                      color: avatarColor.withOpacity(0.18),
+                      blurRadius: 6,
+                      offset: Offset(0, 2),
                     ),
                   ],
                 ),
