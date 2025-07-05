@@ -8,23 +8,23 @@ import 'login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
   LoginView({super.key}) {
-    Get.lazyPut(() => LoginController());
+    Get.put(() => LoginController());
   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       body: SingleChildScrollView(
-            child: Container(
+        child: Container(
           height: MediaQuery.of(context).size.height,
-              child: Column(
-                children: [
+          child: Column(
+            children: [
               // Header avec logo et titre
-                  Container(
+              Container(
                 padding: EdgeInsets.symmetric(
                     horizontal: AppSpacings.xl, vertical: AppSpacings.xxxxl),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryColor,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryColor,
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(30),
                     bottomRight: Radius.circular(30),
@@ -52,15 +52,15 @@ class LoginView extends GetView<LoginController> {
                             offset: Offset(0, 5),
                           ),
                         ],
-                    ),
-                    child: Icon(
-                      AppIcons.store,
+                      ),
+                      child: Icon(
+                        AppIcons.store,
                         size: 40,
                         color: AppColors.primaryColor,
                       ),
                     ),
-                  SizedBox(height: AppSpacings.xxl),
-                  Text(
+                    SizedBox(height: AppSpacings.xxl),
+                    Text(
                       'CommercePro',
                       style: AppTypography.titleLarge.copyWith(
                         color: AppColors.textOnPrimary,
@@ -84,40 +84,40 @@ class LoginView extends GetView<LoginController> {
               Expanded(
                 child: Container(
                   padding: EdgeInsets.all(AppSpacings.xl),
-                    child: Form(
-                      key: controller.formKey,
-                      child: Column(
+                  child: Form(
+                    key: controller.formKey,
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
+                      children: [
                         _buildFormField(
-                            controller: controller.emailController,
+                          controller: controller.emailController,
                           label: 'Adresse email',
                           hint: 'exemple@email.com',
                           icon: AppIcons.email,
-                            keyboardType: TextInputType.emailAddress,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Veuillez entrer votre email';
-                              }
-                              if (!value.contains('@')) {
-                                return 'Email invalide';
-                              }
-                              return null;
-                            },
-                          ),
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Veuillez entrer votre email';
+                            }
+                            if (!value.contains('@')) {
+                              return 'Email invalide';
+                            }
+                            return null;
+                          },
+                        ),
                         SizedBox(height: AppSpacings.xxl),
 
                         _buildPasswordField(
-                            controller: controller.passwordController,
+                          controller: controller.passwordController,
                           label: 'Mot de passe',
                           hint: 'Entrez votre mot de passe',
                           icon: AppIcons.lock,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
                               return 'Veuillez entrer votre mot de passe';
-                              }
-                              return null;
-                            },
+                            }
+                            return null;
+                          },
                         ),
                         SizedBox(height: AppSpacings.xxxl),
 
@@ -134,17 +134,17 @@ class LoginView extends GetView<LoginController> {
                               ),
                             ],
                           ),
-                            child: ElevatedButton(
+                          child: ElevatedButton(
                             onPressed: () {
                               controller.login();
                             },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primaryColor,
-                                padding: EdgeInsets.symmetric(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryColor,
+                              padding: EdgeInsets.symmetric(
                                 vertical: AppSpacings.m,
                                 horizontal: AppSpacings.l,
-                                ),
-                                shape: RoundedRectangleBorder(
+                              ),
+                              shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               elevation: 0,
@@ -181,13 +181,13 @@ class LoginView extends GetView<LoginController> {
                               width: 2,
                             ),
                           ),
-                            child: ElevatedButton(
+                          child: ElevatedButton(
                             onPressed: () {
                               Get.toNamed(Routes.SIGN_UP);
                             },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.backgroundWhite,
-                                padding: EdgeInsets.symmetric(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.backgroundWhite,
+                              padding: EdgeInsets.symmetric(
                                 vertical: AppSpacings.m,
                                 horizontal: AppSpacings.l,
                               ),
@@ -217,7 +217,7 @@ class LoginView extends GetView<LoginController> {
                           ),
                         ),
                         SizedBox(height: AppSpacings.l),
-                           TextButton(
+                        TextButton(
                           onPressed: () {
                             // TODO: Implémenter la récupération de mot de passe
                           },
@@ -239,7 +239,6 @@ class LoginView extends GetView<LoginController> {
                                 color: AppColors.greyLight,
                               ),
                             ),
-
                             Expanded(
                               child: Container(
                                 height: 1,
@@ -292,7 +291,7 @@ class LoginView extends GetView<LoginController> {
                                       ),
                                     ),
                                     child: Center(
-                              child: Text(
+                                      child: Text(
                                         'G',
                                         style: TextStyle(
                                           color: Colors.red,
@@ -305,7 +304,7 @@ class LoginView extends GetView<LoginController> {
                                   label: Text(
                                     'Google',
                                     style: AppTypography.bodySmall.copyWith(
-                                  color: AppColors.textPrimary,
+                                      color: AppColors.textPrimary,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -326,7 +325,7 @@ class LoginView extends GetView<LoginController> {
                                   ],
                                 ),
                                 child: ElevatedButton.icon(
-                              onPressed: () {
+                                  onPressed: () {
                                     controller.signInWithFacebook();
                                   },
                                   style: ElevatedButton.styleFrom(
@@ -349,7 +348,7 @@ class LoginView extends GetView<LoginController> {
                                       borderRadius: BorderRadius.circular(3),
                                     ),
                                     child: Center(
-                              child: Text(
+                                      child: Text(
                                         'f',
                                         style: TextStyle(
                                           color: Color(0xFF1877F2),
@@ -374,15 +373,14 @@ class LoginView extends GetView<LoginController> {
                         SizedBox(height: AppSpacings.xxxl),
 
                         // Lien mot de passe oublié
-
                       ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

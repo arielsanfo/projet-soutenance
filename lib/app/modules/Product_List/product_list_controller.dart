@@ -41,7 +41,7 @@ class ProductListController extends GetxController {
     isLoading.value = true;
     try {
       final fetchedProducts = await productService.getAllProducts();
-
+      print(fetchedProducts.map((toElement) => toElement.sku).toList());
       // Charger les catégories pour chaque produit
       for (var product in fetchedProducts) {
         await product.categoryLink.load();
@@ -91,7 +91,8 @@ class ProductListController extends GetxController {
     switch (selectedTab.value) {
       case 1: // Stock Bas
         filtered = filtered
-            .where((p) => (p.stockQuantity ?? 0) >= 1 && (p.stockQuantity ?? 0) < 10)
+            .where((p) =>
+                (p.stockQuantity ?? 0) >= 1 && (p.stockQuantity ?? 0) < 10)
             .toList();
         break;
       case 2: // Rupture

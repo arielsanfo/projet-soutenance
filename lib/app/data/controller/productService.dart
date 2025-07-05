@@ -59,6 +59,22 @@ class ProductService {
         .findAll();
   }
 
+  /// Recherche stricte par nom (égalité, insensible à la casse)
+  Future<List<Product>> searchProductsByNameExact(String name) async {
+    return await isar.products
+        .filter()
+        .nameEqualTo(name, caseSensitive: false)
+        .findAll();
+  }
+
+  /// Recherche stricte par SKU (égalité, insensible à la casse)
+  Future<List<Product>> searchProductsBySkuExact(String sku) async {
+    return await isar.products
+        .filter()
+        .skuEqualTo(sku, caseSensitive: false)
+        .findAll();
+  }
+
   /// Mettre à jour le stock d'un produit et enregistrer le mouvement d'inventaire.
   /// C'est une méthode transactionnelle cruciale.
   Future<void> updateStock({

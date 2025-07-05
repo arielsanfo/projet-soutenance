@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:isar/isar.dart';
+import 'package:uuid/uuid.dart';
 import '../../data/controller/productService.dart';
 import '../../data/storage.dart';
 import '../Product_List/product_list_controller.dart';
@@ -94,17 +95,35 @@ class AddProductController extends GetxController {
         final price = double.tryParse(priceController.text) ?? 0.0;
         final stock = int.tryParse(stockController.text) ?? 0;
         final categoryName = selectedCategory ?? categoryController.text;
-        final sku = skuController.text.trim();
+        String sku = skuController.text.trim();
 
-        // Vérification des doublons (nom ou SKU)
-        final existingProducts = await isar.products
-            .filter()
-            .group((q) => q
-                .nameEqualTo(name, caseSensitive: false)
-                .or()
-                .skuEqualTo(sku.isNotEmpty ? sku : '', caseSensitive: false))
-            .findAll();
-        if (!isEditing && existingProducts.isNotEmpty) {
+        // Générer un SKU unique si non fourni
+        if (sku.isEmpty) {
+          sku = 'SKU-${const Uuid().v4()}';
+        }
+
+        // Vérification stricte des doublons (nom ou SKU) pour la création
+        bool hasDuplicate = false;
+        if (!isEditing) {
+          // Recherche stricte sur le nom
+          final nameDup = await productService.searchProductsByNameExact(name);
+          // Recherche stricte sur le SKU si renseigné
+          List<Product> skuDup = [];
+          if (sku.isNotEmpty) {
+            skuDup = await productService.searchProductsBySkuExact(sku);
+          }
+          hasDuplicate = nameDup.isNotEmpty || skuDup.isNotEmpty;
+        } else if (isEditing && productToEdit != null) {
+          // En édition, vérifier que le nom ou le SKU n'appartient pas à un autre produit
+          final nameDup = await productService.searchProductsByNameExact(name);
+          final skuDup = sku.isNotEmpty
+              ? await productService.searchProductsBySkuExact(sku)
+              : <Product>[];
+          hasDuplicate = nameDup.any((p) => p.id != productToEdit!.id) ||
+              skuDup.any((p) => p.id != productToEdit!.id);
+        }
+
+        if (hasDuplicate) {
           Get.snackbar(
             'Doublon',
             'Un produit avec ce nom ou ce SKU existe déjà.',
@@ -138,7 +157,7 @@ class AddProductController extends GetxController {
           productToEdit!.name = name;
           productToEdit!.description = description;
           productToEdit!.salePrice = price;
-          productToEdit!.sku = sku.isNotEmpty ? sku : null;
+          productToEdit!.sku = sku;
 
           // Ne pas modifier le stock directement ici, utiliser updateStock si nécessaire
           // productToEdit!.stockQuantity = stock;
@@ -174,8 +193,9 @@ class AddProductController extends GetxController {
             description: description,
             salePrice: price,
             stockQuantity: stock,
-            sku: sku.isNotEmpty ? sku : null,
+            sku: sku,
           );
+          print(product.sku);
 
           await productService.saveProduct(product, categoryId: categoryId);
 
