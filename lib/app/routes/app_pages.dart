@@ -29,6 +29,8 @@ import '../modules/DetailsReturn/details_return_binding.dart';
 import '../modules/DetailsReturn/details_return_view.dart';
 import '../modules/DetailsSupplier/details_supplier_binding.dart';
 import '../modules/DetailsSupplier/details_supplier_view.dart';
+import '../modules/Dettes/dettes_binding.dart';
+import '../modules/Dettes/dettes_view.dart';
 import '../modules/Expense_Report/expense_report_binding.dart';
 import '../modules/Expense_Report/expense_report_view.dart';
 import '../modules/Expense_Report/add_expense_view.dart';
@@ -366,6 +368,11 @@ class AppPages {
       page: () => const DetailSaleView(),
       binding: DetailSaleBinding(),
     ),
+    GetPage(
+      name: _Paths.DETTES,
+      page: () => const DettesView(),
+      binding: DettesBinding(),
+    ),
   ];
 }
 
@@ -410,4 +417,5 @@ class Routes {
   static const LIST_SALE = '/list-sale';
   static const DETAIL_SALE = '/detail-sale';
   static const ADD_EXPENSE = '/add-expense';
+  static const DETTES = '/dettes';
 }

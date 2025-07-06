@@ -8,7 +8,7 @@ import 'package:isar/isar.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
 import 'package:flutter_application_1/app/routes/app_pages.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginController extends GetxController {
   final formKey = GlobalKey();
@@ -34,6 +34,22 @@ class LoginController extends GetxController {
         passwordController.text = 'defaultPassword'; // Set a default password
       }
     });
+    
+    // Vérifier si l'utilisateur est déjà connecté au démarrage
+    _checkExistingSession();
+  }
+
+  /// Vérifier s'il y a une session existante et informer l'utilisateur
+  Future<void> _checkExistingSession() async {
+    final isLoggedIn = await SessionManager.isLoggedIn();
+    if (isLoggedIn) {
+      final userName = await SessionManager.getUserName();
+      if (userName != null) {
+        // Attendre un peu pour que la page se charge
+        await Future.delayed(Duration(milliseconds: 500));
+        SessionNotificationService.notifyAutoLogin(userName);
+      }
+    }
   }
 
   @override
@@ -78,28 +94,33 @@ class LoginController extends GetxController {
     final password = passwordController.text;
     
     if (email.isEmpty || password.isEmpty) {
-      _showSnackbar('Erreur', 'Veuillez remplir tous les champs', SNACKBAR_TYPE.ERROR);
+      SessionNotificationService.notifyLoginError('Veuillez remplir tous les champs');
       return;
     }
     
     final user = await userService.getUserByEmail(email);
     if (user == null) {
-      _showSnackbar('Erreur', 'Aucun utilisateur trouvé avec cet email', SNACKBAR_TYPE.ERROR);
+      SessionNotificationService.notifyLoginError('Aucun utilisateur trouvé avec cet email');
       return;
     }
     
     final passwordHash = sha256.convert(utf8.encode(password)).toString();
     if (user.passwordHash != passwordHash) {
-      _showSnackbar('Erreur', 'Mot de passe incorrect', SNACKBAR_TYPE.ERROR);
+      SessionNotificationService.notifyLoginError('Mot de passe incorrect');
       return;
     }
     
-    // Succès : naviguer vers le dashboard
-    _showSnackbar('Succès', 'Connexion réussie ! Bienvenue ${user.name}', SNACKBAR_TYPE.SUCCESS);
+    // Succès : sauvegarder la session et naviguer vers le dashboard
+    print('=== CONNEXION RÉUSSIE ===');
+    print('Sauvegarde de la session pour: ${user.name}');
     
-    // Sauvegarder la session utilisateur
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('is_logged_in', true);
+    await SessionManager.saveSession(user);
+    
+    // Vérifier que la session a été sauvegardée
+    final sessionSaved = await SessionManager.isLoggedIn();
+    print('Session sauvegardée avec succès: $sessionSaved');
+    
+    SessionNotificationService.notifyLoginSuccess(user.name ?? 'Utilisateur');
     
     // Attendre un peu pour que l'utilisateur voie le message de succès
     await Future.delayed(Duration(seconds: 1));
@@ -108,9 +129,51 @@ class LoginController extends GetxController {
   }
 
   Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('is_logged_in', false);
+    print('=== DÉCONNEXION ===');
+    await SessionManager.clearSession();
+    
+    // Vérifier que la session a été effacée
+    final sessionCleared = !(await SessionManager.isLoggedIn());
+    print('Session effacée avec succès: $sessionCleared');
+    
+    SessionNotificationService.notifyLogout();
     Get.offAllNamed(Routes.LOGIN);
+  }
+
+  /// Méthode de test pour vérifier la persistance de session
+  Future<void> testSessionPersistence() async {
+    print('=== TEST PERSISTANCE SESSION ===');
+    final isLoggedIn = await SessionManager.isLoggedIn();
+    print('Session active: $isLoggedIn');
+    
+    if (isLoggedIn) {
+      final user = await SessionManager.getCurrentUser();
+      print('Utilisateur connecté: ${user?.name} (${user?.email})');
+      
+      // Afficher les informations de session
+      final sessionInfo = await SessionManager.getSessionInfo();
+      print('Informations de session: $sessionInfo');
+    }
+  }
+
+  /// Vérifier si l'utilisateur est déjà connecté (pour auto-login)
+  Future<bool> checkUserSession() async {
+    return await SessionManager.isLoggedIn();
+  }
+
+  /// Récupérer l'utilisateur connecté actuellement
+  Future<User?> getCurrentUser() async {
+    return await SessionManager.getCurrentUser();
+  }
+
+  /// Valider la session actuelle
+  Future<bool> validateCurrentSession() async {
+    return await SessionManager.validateSession();
+  }
+
+  /// Rafraîchir la session
+  Future<void> refreshSession() async {
+    await SessionManager.refreshSession();
   }
 
   // Méthode pour afficher les snackbars avec le style personnalisé

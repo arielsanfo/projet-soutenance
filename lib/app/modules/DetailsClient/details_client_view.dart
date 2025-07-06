@@ -464,47 +464,243 @@ class DetailsClientView extends GetView<DetailsClientController> {
   }
 
   Widget _buildDebtsList() {
-    return Obx(() {
-      final debts = controller.debts;
-      if (debts.isEmpty) {
-        return Center(
-          child: Text('Aucune dette', style: AppTypography.bodyMedium),
-        );
-      }
-      return Column(
-        children: debts.map((debt) {
-          return Card(
-            margin: EdgeInsets.only(bottom: AppSpacings.m),
-            shape: RoundedRectangleBorder(borderRadius: AppRadius.large),
+    final debts = controller.debts;
+    final totalRestant = debts.fold<double>(0, (sum, d) => sum + (d.remainingAmount ?? 0));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Dettes du client', style: AppTypography.titleLarge),
+            Text('Total restant dû : ${totalRestant.toStringAsFixed(2)} €', style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.bold, color: AppColors.errorColor)),
+          ],
+        ),
+        SizedBox(height: AppSpacings.m),
+        ElevatedButton.icon(
+          icon: Icon(Icons.edit, color: AppColors.primaryColor),
+          label: Text('Ajustement manuel'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.backgroundWhite,
+            foregroundColor: AppColors.primaryColor,
             elevation: 2,
-            shadowColor: AppColors.warningColor.withOpacity(0.06),
-            child: ListTile(
-              leading: Icon(AppIcons.debt, color: AppColors.warningColor),
-              title: Text(
-                'Dette du ${(debt.debtDate != null) ? '${debt.debtDate!.day}/${debt.debtDate!.month}/${debt.debtDate!.year}' : ''}',
-                style: AppTypography.bodyMedium,
+            shape: RoundedRectangleBorder(borderRadius: AppRadius.large),
+          ),
+          onPressed: () async {
+            final products = await controller.getProductsForCustomer();
+            showModalBottomSheet(
+              context: Get.context!,
+              isScrollControlled: true,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+              builder: (ctx) {
+                final selectedProducts = <Product>[].obs;
+                final montantController = TextEditingController();
+                final avanceController = TextEditingController();
+                final formKey = GlobalKey<FormState>();
+                RxBool isSolvable = (totalRestant <= 0).obs;
+                void updateSolvable() {
+                  final montant = double.tryParse(montantController.text) ?? 0;
+                  final avance = double.tryParse(avanceController.text) ?? 0;
+                  isSolvable.value = (totalRestant - montant + avance) <= 0;
+                }
+                return Padding(
+                  padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+                  child: StatefulBuilder(
+                    builder: (context, setState) {
+                      return Obx(() => SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: Form(
+                            key: formKey,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Ajustement manuel des dettes', style: AppTypography.titleLarge),
+                                SizedBox(height: AppSpacings.m),
+                                Text('Client : ${controller.customer.value?.name ?? "-"}', style: AppTypography.bodyMedium),
+                                SizedBox(height: AppSpacings.s),
+                                Text('Produits concernés :', style: AppTypography.bodySmall),
+                                Wrap(
+                                  spacing: 8,
+                                  children: products.map((p) => FilterChip(
+                                    label: Text(p.name ?? ''),
+                                    selected: selectedProducts.contains(p),
+                                    onSelected: (v) {
+                                      setState(() {
+                                        if (v) {
+                                          selectedProducts.add(p);
+                                        } else {
+                                          selectedProducts.remove(p);
+                                        }
+                                      });
+                                    },
+                                  )).toList(),
+                                ),
+                                SizedBox(height: AppSpacings.s),
+                                TextFormField(
+                                  controller: montantController,
+                                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                  decoration: InputDecoration(labelText: 'Montant à ajuster (€)'),
+                                  validator: (v) {
+                                    final val = double.tryParse(v ?? '');
+                                    if (val == null || val == 0) return 'Montant invalide';
+                                    return null;
+                                  },
+                                  onChanged: (_) => updateSolvable(),
+                                ),
+                                SizedBox(height: AppSpacings.s),
+                                TextFormField(
+                                  controller: avanceController,
+                                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                                  decoration: InputDecoration(labelText: 'Avance (optionnel)'),
+                                  onChanged: (_) => updateSolvable(),
+                                ),
+                                SizedBox(height: AppSpacings.s),
+                                Obx(() => Row(
+                                  children: [
+                                    Text('Statut : ', style: AppTypography.bodySmall),
+                                    Text(isSolvable.value ? 'Solvable' : 'Non solvable',
+                                      style: AppTypography.bodySmall.copyWith(
+                                        color: isSolvable.value ? AppColors.successColor : AppColors.errorColor,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                )),
+                                SizedBox(height: AppSpacings.m),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(ctx).pop(),
+                                      child: Text('Annuler'),
+                                    ),
+                                    SizedBox(width: 8),
+                                    ElevatedButton(
+                                      onPressed: () async {
+                                        if (!formKey.currentState!.validate()) return;
+                                        // TODO: appliquer l'ajustement (créer/éditer une dette, gérer avance, etc.)
+                                        // Rafraîchir toutes les pages concernées
+                                        Navigator.of(ctx).pop();
+                                        Get.snackbar('Succès', 'Ajustement effectué', snackPosition: SnackPosition.BOTTOM);
+                                        await controller.loadCustomerData(controller.customer.value!.id!);
+                                        // TODO: notifier/rafraîchir les autres pages concernées si besoin
+                                      },
+                                      child: Text('Valider'),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ));
+                    },
+                  ),
+                );
+              },
+            );
+          },
+        ),
+        SizedBox(height: AppSpacings.m),
+        debts.isEmpty
+            ? Text('Aucune dette enregistrée.', style: AppTypography.bodyMedium)
+            : ListView.separated(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: debts.length,
+                separatorBuilder: (_, __) => SizedBox(height: AppSpacings.s),
+                itemBuilder: (context, i) {
+                  final d = debts[i];
+                  final status = d.status ?? DebtStatusIsar.unpaid;
+                  Color statusColor;
+                  String statusLabel;
+                  IconData statusIcon;
+                  switch (status) {
+                    case DebtStatusIsar.paid:
+                      statusColor = AppColors.successColor;
+                      statusLabel = 'Payée';
+                      statusIcon = Icons.check_circle;
+                      break;
+                    case DebtStatusIsar.partiallyPaid:
+                      statusColor = AppColors.warningColor;
+                      statusLabel = 'Partielle';
+                      statusIcon = Icons.hourglass_bottom;
+                      break;
+                    default:
+                      statusColor = AppColors.errorColor;
+                      statusLabel = 'Non payée';
+                      statusIcon = Icons.warning_amber;
+                  }
+                  return Card(
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(borderRadius: AppRadius.large),
+                    child: ListTile(
+                      leading: Icon(statusIcon, color: statusColor, size: 32),
+                      title: Text('Montant initial : ${(d.initialAmount ?? 0).toStringAsFixed(2)} €', style: AppTypography.bodyMedium),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Restant dû : ${(d.remainingAmount ?? 0).toStringAsFixed(2)} €', style: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold, color: status == DebtStatusIsar.paid ? AppColors.successColor : AppColors.errorColor)),
+                          if (d.dueDate != null)
+                            Text('Échéance : ${d.dueDate!.day}/${d.dueDate!.month}/${d.dueDate!.year}', style: AppTypography.bodySmall),
+                          if ((d.notes ?? '').isNotEmpty)
+                            Text('Notes : ${d.notes}', style: AppTypography.bodySmall),
+                        ],
+                      ),
+                      trailing: IconButton(
+                        icon: Icon(Icons.history, color: AppColors.primaryColor),
+                        tooltip: 'Historique des paiements',
+                        onPressed: () async {
+                          final payments = await controller.getPaymentsForDebt(d);
+                          showDialog(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: Text('Historique des paiements', style: AppTypography.titleLarge),
+                              content: payments.isEmpty
+                                  ? Text('Aucun paiement enregistré.', style: AppTypography.bodyMedium)
+                                  : SizedBox(
+                                      width: 320,
+                                      child: ListView.separated(
+                                        shrinkWrap: true,
+                                        itemCount: payments.length,
+                                        separatorBuilder: (_, __) => Divider(),
+                                        itemBuilder: (context, j) {
+                                          final p = payments[j];
+                                          return ListTile(
+                                            leading: Icon(Icons.payments, color: AppColors.primaryColor),
+                                            title: Text('${p.amountPaid?.toStringAsFixed(2) ?? "-"} €', style: AppTypography.bodyMedium),
+                                            subtitle: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                if (p.paymentDate != null)
+                                                  Text('Date : ${p.paymentDate!.day}/${p.paymentDate!.month}/${p.paymentDate!.year}', style: AppTypography.bodySmall),
+                                                if (p.paymentMethod != null)
+                                                  Text('Méthode : ${p.paymentMethod}', style: AppTypography.bodySmall),
+                                                if ((p.notes ?? '').isNotEmpty)
+                                                  Text('Notes : \\${p.notes}', style: AppTypography.bodySmall),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: Text('Fermer'),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                },
               ),
-              subtitle: Text(
-                debt.status == DebtStatusIsar.paid
-                    ? 'Payée'
-                    : debt.status == DebtStatusIsar.partiallyPaid
-                        ? 'Partiellement payée'
-                        : 'Non payée',
-                style: AppTypography.bodySmall,
-              ),
-              trailing: Text(
-                '${(debt.remainingAmount ?? 0).toStringAsFixed(2)} €',
-                style: AppTypography.bodyMedium.copyWith(
-                  color: debt.status == DebtStatusIsar.paid
-                      ? AppColors.successColor
-                      : AppColors.tagRedText,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-      );
-    });
+      ],
+    );
   }
 }

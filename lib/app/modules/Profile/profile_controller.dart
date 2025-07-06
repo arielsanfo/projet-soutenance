@@ -49,8 +49,9 @@ class ProfileController extends GetxController {
   void increment() => count.value++;
 
   Future<void> logout() async {
-    // Efface l'utilisateur courant et redirige vers la page de login
-    currentUser = null;
+    // Effacer la session et rediriger vers la page de login
+    await SessionManager.clearSession();
+    SessionNotificationService.notifyLogout();
     Get.offAllNamed(Routes.LOGIN);
   }
 

@@ -79,4 +79,25 @@ class DetailsClientController extends GetxController {
 
   // Changer d'onglet
   void selectTab(int index) => selectedTab.value = index;
+
+  Future<List<DebtPayment>> getPaymentsForDebt(Debt debt) async {
+    await debt.payments.load();
+    return debt.payments.toList();
+  }
+
+  Future<List<Product>> getProductsForCustomer() async {
+    if (customer.value == null) return [];
+    final salesList = await isar.sales.filter().customerLink((q) => q.idEqualTo(customer.value!.id!)).findAll();
+    final productSet = <Product>{};
+    for (final sale in salesList) {
+      await sale.saleItems.load();
+      for (final item in sale.saleItems) {
+        await item.productLink.load();
+        if (item.productLink.value != null) {
+          productSet.add(item.productLink.value!);
+        }
+      }
+    }
+    return productSet.toList();
+  }
 }

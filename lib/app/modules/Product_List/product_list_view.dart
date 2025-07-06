@@ -146,10 +146,10 @@ class ProductListView extends GetView<ProductListController> {
                               }
                               return ListView.builder(
                                 itemCount: lowStockProducts.length,
-                                itemBuilder: (context, index) {
+                              itemBuilder: (context, index) {
                                   final product = lowStockProducts[index];
-                                  return _buildProductCard(product);
-                                },
+                                return _buildProductCard(product);
+                              },
                               );
                             }),
                             // Rupture
@@ -172,14 +172,14 @@ class ProductListView extends GetView<ProductListController> {
                               }
                               return ListView.builder(
                                 itemCount: outOfStockProducts.length,
-                                itemBuilder: (context, index) {
+                              itemBuilder: (context, index) {
                                   final product = outOfStockProducts[index];
                                   return _buildProductCard(product, showOutOfStock: true);
-                                },
+                              },
                               );
                             }),
                           ],
-                        ),
+                          ),
                       )
                     ],
                   )))
@@ -259,11 +259,11 @@ class ProductListView extends GetView<ProductListController> {
         boxShadow: [
           BoxShadow(
             color: AppColors.greyLight.withOpacity(0.15),
-            blurRadius: 8,
-            offset: Offset(0, 2),
+                blurRadius: 8,
+                offset: Offset(0, 2),
+              ),
+            ],
           ),
-        ],
-      ),
       child: Stack(
         children: [
           Row(
@@ -271,11 +271,11 @@ class ProductListView extends GetView<ProductListController> {
             children: [
               CircleAvatar(
                 backgroundColor: AppColors.primaryColor.withOpacity(0.12),
-                child: Text(
-                  controller.getProductInitial(product),
+            child: Text(
+              controller.getProductInitial(product),
                   style: TextStyle(
                     color: AppColors.primaryColor,
-                    fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
                 ),
@@ -304,30 +304,30 @@ class ProductListView extends GetView<ProductListController> {
                           'Stock: ${product.stockQuantity ?? 0}',
                           style: TextStyle(
                             color: controller.getStockColor(product),
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
                         SizedBox(width: 12),
-                        Container(
+            Container(
                           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
+              decoration: BoxDecoration(
                             color: controller.getStockColor(product).withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
                             controller.getStockStatus(product),
                             style: TextStyle(
                               color: controller.getStockColor(product),
                               fontWeight: FontWeight.w600,
                               fontSize: 12,
-                            ),
-                          ),
-                        ),
+                ),
+              ),
+            ),
                         if (showOutOfStock && (product.stockQuantity ?? 0) == 0) ...[
                           SizedBox(width: 12),
-                          Container(
+                Container(
                             padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
+                  decoration: BoxDecoration(
                               color: Colors.red.withOpacity(0.15),
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -340,17 +340,17 @@ class ProductListView extends GetView<ProductListController> {
                             ),
                           ),
                         ],
-                      ],
-                    ),
-                  ],
-                ),
+              ],
+            ),
+          ],
+        ),
               ),
             ],
           ),
           Positioned(
             top: 0,
             right: 0,
-            child: PopupMenuButton<String>(
+          child: PopupMenuButton<String>(
               icon: Icon(Icons.more_vert, color: AppColors.primaryColor),
               onSelected: (value) async {
                 if (value == 'details') {
@@ -406,38 +406,38 @@ class ProductListView extends GetView<ProductListController> {
               },
               itemBuilder: (context) => [
                 PopupMenuItem(
-                  value: 'details',
-                  child: Row(
-                    children: [
+                value: 'details',
+                child: Row(
+                  children: [
                       Icon(Icons.info, color: AppColors.primaryColor, size: 20),
                       SizedBox(width: 8),
                       Text('Voir détails'),
-                    ],
-                  ),
+                  ],
                 ),
+              ),
                 PopupMenuItem(
-                  value: 'edit',
-                  child: Row(
-                    children: [
+                value: 'edit',
+                child: Row(
+                  children: [
                       Icon(Icons.edit, color: AppColors.tagGreenText, size: 20),
                       SizedBox(width: 8),
-                      Text('Modifier'),
-                    ],
-                  ),
+                    Text('Modifier'),
+                  ],
                 ),
+              ),
                 PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
+                value: 'delete',
+                child: Row(
+                  children: [
                       Icon(Icons.delete, color: Colors.red, size: 20),
                       SizedBox(width: 8),
-                      Text('Supprimer'),
-                    ],
-                  ),
+                    Text('Supprimer'),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+        ),
         ],
       ),
     );

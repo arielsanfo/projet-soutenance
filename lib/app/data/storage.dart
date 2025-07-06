@@ -126,6 +126,8 @@ class Product {
   @Backlink(to: 'productLink')
   final inventoryMovements = IsarLinks<InventoryMovement>();
 
+  var category;
+
   // Constructeur
   Product({
     required this.name,
@@ -367,6 +369,7 @@ class SupplierOrder {
   SupplierOrderStatusIsar? status;
 
   String? notes;
+  String? receptionComment; // Commentaire global de réception
 
   // Liaison: fournisseur
   final supplierLink = IsarLink<Supplier>();
@@ -401,6 +404,9 @@ class SupplierOrderItem {
   int? quantityReceived;
   double? unitCost; // Coût unitaire d'achat
   double? totalCost; // quantityOrdered * unitCost
+  String? lotNumber;
+  DateTime? expirationDate;
+  String? comment; // Commentaire par produit
 
   // Liaison: produit commandé
   final productLink = IsarLink<Product>();

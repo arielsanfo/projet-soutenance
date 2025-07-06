@@ -1,9 +1,11 @@
 // import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:isar/isar.dart';
 import '../../data/storage.dart';
 import '../../data/controller/saleService.dart';
 import '../../data/controller/supplierService.dart';
+import '../ManagementOrder/management_order_controller.dart';
 
 class AddOrderController extends GetxController {
   final products = <Product>[].obs;
@@ -80,14 +82,29 @@ class AddOrderController extends GetxController {
 
   Future<void> saveOrder() async {
     if (selectedSupplier.value == null || cartItems.isEmpty) {
-      Get.snackbar('Erreur', 'Sélectionnez un fournisseur et ajoutez des produits.');
+      Get.snackbar('Erreur', 'Sélectionnez un fournisseur et ajoutez des produits.', backgroundColor: Colors.red, colorText: Colors.white, snackPosition: SnackPosition.TOP);
       return;
     }
     isLoading.value = true;
-    // Ici, il faudrait appeler le service de commande fournisseur si besoin
-    // await saleService.processNewSale(...)
-    isLoading.value = false;
-    Get.snackbar('Succès', 'Commande enregistrée !');
-    cartItems.clear();
+    try {
+      final items = cartItems.map((item) => {
+        'productName': item.productLink.value?.name ?? '',
+        'quantity': item.quantity ?? 0,
+        'unitCost': item.unitPriceAtSale ?? 0.0,
+      }).toList();
+      final managementOrderController = Get.find<ManagementOrderController>();
+      await managementOrderController.createSupplierOrder(
+        supplierName: selectedSupplier.value!.name ?? '',
+        items: items,
+        notes: null,
+      );
+      isLoading.value = false;
+      cartItems.clear();
+      Get.back();
+      Get.snackbar('Succès', 'Commande fournisseur ajoutée avec succès', backgroundColor: Colors.green, colorText: Colors.white, snackPosition: SnackPosition.TOP);
+    } catch (e) {
+      isLoading.value = false;
+      Get.snackbar('Erreur', 'Erreur lors de l\'ajout de la commande fournisseur', backgroundColor: Colors.red, colorText: Colors.white, snackPosition: SnackPosition.TOP);
+    }
   }
 }

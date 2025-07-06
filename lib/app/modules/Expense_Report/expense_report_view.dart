@@ -4,7 +4,7 @@ import 'package:flutter_application_1/helpers/app_constante.dart';
 import 'package:get/get.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:pdf/pdf.dart';
+// import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import '../../data/storage.dart';
 
@@ -123,10 +123,10 @@ class ExpenseReportView extends GetView<ExpenseReportController> {
       ),
       body: GetBuilder<ExpenseReportController>(
         builder: (controller) => SingleChildScrollView(
-          padding: EdgeInsets.all(AppSpacings.l),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        padding: EdgeInsets.all(AppSpacings.l),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -139,55 +139,55 @@ class ExpenseReportView extends GetView<ExpenseReportController> {
                 ],
               ),
               SizedBox(height: AppSpacings.l),
-              Text('Dépenses', style: AppTypography.headline1),
-              SizedBox(height: AppSpacings.l),
+            Text('Dépenses', style: AppTypography.headline1),
+            SizedBox(height: AppSpacings.l),
               // Sélecteur de période (placeholder)
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppSpacings.xxl,
-                  vertical: AppSpacings.xl,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.greyLight,
-                  borderRadius: AppRadius.defaultRadius,
-                  border: Border.all(color: AppColors.greyMedium),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Mai 2024', style: AppTypography.titleMedium),
-                    Icon(Icons.arrow_drop_down, color: AppColors.greyDark),
-                  ],
-                ),
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: AppSpacings.xxl,
+                vertical: AppSpacings.xl,
               ),
-              SizedBox(height: AppSpacings.xxl),
+              decoration: BoxDecoration(
+                color: AppColors.greyLight,
+                borderRadius: AppRadius.defaultRadius,
+                border: Border.all(color: AppColors.greyMedium),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Mai 2024', style: AppTypography.titleMedium),
+                  Icon(Icons.arrow_drop_down, color: AppColors.greyDark),
+                ],
+              ),
+            ),
+            SizedBox(height: AppSpacings.xxl),
               // Total dynamique
               Text('Total Dépenses (${_monthName(controller.selectedMonth.value)} ${controller.selectedYear.value})', style: AppTypography.titleMedium),
-              SizedBox(height: AppSpacings.m),
-              Text(
+            SizedBox(height: AppSpacings.m),
+            Text(
                 '${controller.total.toStringAsFixed(2)} FCFA',
-                style: AppTypography.headline1.apply(
-                  color: AppColors.primaryDarker,
-                ),
+              style: AppTypography.headline1.apply(
+                color: AppColors.primaryDarker,
               ),
-              SizedBox(height: AppSpacings.xxxl),
+            ),
+            SizedBox(height: AppSpacings.xxxl),
               // Bar chart réel
               Text('Répartition par catégorie', style: AppTypography.titleMedium.copyWith(fontWeight: FontWeight.w600)),
               SizedBox(height: 8),
-              Container(
+            Container(
                 height: 220,
-                padding: EdgeInsets.all(AppSpacings.l),
-                decoration: BoxDecoration(
-                  color: AppColors.backgroundLight,
-                  borderRadius: AppRadius.defaultRadius,
-                ),
+              padding: EdgeInsets.all(AppSpacings.l),
+              decoration: BoxDecoration(
+                color: AppColors.backgroundLight,
+                borderRadius: AppRadius.defaultRadius,
+              ),
                 child: controller.filteredExpenses.isEmpty
                     ? Center(child: Text('Aucune donnée pour le graphique'))
                     : _ExpenseBarChart(expenses: controller.filteredExpenses),
-              ),
-              SizedBox(height: AppSpacings.xxl),
-              Text('Dépenses détaillées', style: AppTypography.titleLarge),
-              SizedBox(height: AppSpacings.l),
+            ),
+            SizedBox(height: AppSpacings.xxl),
+            Text('Dépenses détaillées', style: AppTypography.titleLarge),
+            SizedBox(height: AppSpacings.l),
               controller.filteredExpenses.isEmpty
                   ? Center(
                       child: Padding(
@@ -202,20 +202,20 @@ class ExpenseReportView extends GetView<ExpenseReportController> {
                       ),
                     )
                   : ListView.separated(
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
                       itemCount: controller.filteredExpenses.length,
                       separatorBuilder: (context, index) => SizedBox(height: AppSpacings.s),
-                      itemBuilder: (context, index) {
+              itemBuilder: (context, index) {
                         final expense = controller.filteredExpenses[index];
                         return AnimatedContainer(
                           duration: Duration(milliseconds: 350),
                           curve: Curves.easeInOut,
-                          padding: EdgeInsets.all(AppSpacings.l),
+                  padding: EdgeInsets.all(AppSpacings.l),
                           margin: EdgeInsets.symmetric(horizontal: 2),
-                          decoration: BoxDecoration(
+                  decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: AppRadius.defaultRadius,
+                    borderRadius: AppRadius.defaultRadius,
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withOpacity(0.06),
@@ -223,10 +223,10 @@ class ExpenseReportView extends GetView<ExpenseReportController> {
                                 offset: Offset(0, 4),
                               ),
                             ],
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -249,7 +249,7 @@ class ExpenseReportView extends GetView<ExpenseReportController> {
                                       SizedBox(width: 10),
                                       Icon(Icons.calendar_today, size: 13, color: AppColors.secondaryColor),
                                       SizedBox(width: 2),
-                                      Text(
+                      Text(
                                         expense.expenseDate != null
                                             ? '${expense.expenseDate!.day}/${expense.expenseDate!.month}/${expense.expenseDate!.year}'
                                             : '',
@@ -304,12 +304,12 @@ class ExpenseReportView extends GetView<ExpenseReportController> {
                                     ),
                                   ),
                                 ],
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
               SizedBox(height: AppSpacings.xxxxl * 2),
             ],
           ),
@@ -321,15 +321,15 @@ class ExpenseReportView extends GetView<ExpenseReportController> {
         children: [
           FloatingActionButton.extended(
             heroTag: 'addExpense',
-            onPressed: () {
+          onPressed: () {
               Get.toNamed('/add-expense');
-            },
-            backgroundColor: AppColors.primaryColor,
-            foregroundColor: Colors.white,
-            elevation: 2,
-            shape: RoundedRectangleBorder(borderRadius: AppRadius.defaultRadius),
-            label: Padding(
-              padding: EdgeInsets.symmetric(vertical: AppSpacings.l),
+          },
+          backgroundColor: AppColors.primaryColor,
+          foregroundColor: Colors.white,
+          elevation: 2,
+          shape: RoundedRectangleBorder(borderRadius: AppRadius.defaultRadius),
+          label: Padding(
+            padding: EdgeInsets.symmetric(vertical: AppSpacings.l),
               child: Text('Ajouter une Dépense', style: TextStyle(fontSize: AppSpacings.l)),
             ),
             icon: Icon(Icons.add),

@@ -44,6 +44,7 @@ abstract class AppRoutes {
   static const DETAIL_SUPPLIER_ORDER = _Paths.DETAIL_SUPPLIER_ORDER;
   static const LIST_SALE = _Paths.LIST_SALE;
   static const DETAIL_SALE = _Paths.DETAIL_SALE;
+  static const DETTES = _Paths.DETTES;
 }
 
 abstract class _Paths {
@@ -88,4 +89,5 @@ abstract class _Paths {
   static const DETAIL_SUPPLIER_ORDER = '/detail-supplier-order';
   static const LIST_SALE = '/list-sale';
   static const DETAIL_SALE = '/detail-sale';
+  static const DETTES = '/dettes';
 }

@@ -4,6 +4,7 @@ import 'expense_report_controller.dart';
 import 'package:flutter_application_1/helpers/app_constante.dart';
 import '../../data/storage.dart';
 
+// ignore: must_be_immutable
 class AddExpenseView extends StatelessWidget {
   AddExpenseView({Key? key}) : super(key: key);
 

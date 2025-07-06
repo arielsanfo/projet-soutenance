@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:isar/isar.dart';
 import '../../../app/data/storage.dart';
 import '../../../app/data/controller/supplierService.dart';
+import '../../../app/data/controller/productService.dart';
 import '../../../helpers/app_constante.dart';
 import 'package:flutter_application_1/app/routes/app_pages.dart';
 
@@ -21,39 +22,21 @@ class AddSupplierController extends GetxController {
   final isEditMode = false.obs;
   Supplier? supplierToEdit;
   late final SupplierService supplierService;
+  late final ProductService productService;
 
   // Propriétés pour le sélecteur de produits
-  List<String> availableProducts = [
-    'Électronique',
-    'Vêtements',
-    'Alimentation',
-    'Maison & Jardin',
-    'Sport & Loisirs',
-    'Livres & Médias',
-    'Beauté & Santé',
-    'Automobile',
-    'Bricolage',
-    'Jouets & Jeux',
-    'Informatique',
-    'Téléphonie',
-    'Meubles',
-    'Décoration',
-    'Outillage',
-    'Textile',
-    'Chaussures',
-    'Accessoires',
-    'Cosmétiques',
-    'Hygiène',
-    'Autres'
-  ];
-  
-  List<String> selectedProducts = [];
+  final availableProducts = <Product>[].obs;
+  final selectedProducts = <Product>[].obs;
 
   @override
   void onInit() {
     super.onInit();
     final isar = Get.find<Isar>();
     supplierService = SupplierService(isar);
+    productService = ProductService(isar);
+
+    // Charger les produits disponibles
+    _loadAvailableProducts();
 
     // Vérifier si on est en mode édition
     final args = Get.arguments;
@@ -64,13 +47,46 @@ class AddSupplierController extends GetxController {
     }
   }
 
-  void toggleProduct(String product) {
-    if (selectedProducts.contains(product)) {
-      selectedProducts.remove(product);
-    } else {
-      selectedProducts.add(product);
+  /// Charger les produits disponibles depuis la base de données
+  Future<void> _loadAvailableProducts() async {
+    try {
+      final products = await productService.getAllProducts();
+      availableProducts.assignAll(products);
+    } catch (e) {
+      print('Erreur lors du chargement des produits: $e');
+      AppSnackbars.showError(
+        'Erreur',
+        'Impossible de charger les produits: ${e.toString()}',
+      );
     }
+  }
+
+  /// Ajouter un produit à la sélection
+  void addProduct(Product product) {
+    if (!selectedProducts.contains(product)) {
+      selectedProducts.add(product);
+      update();
+    }
+  }
+
+  /// Retirer un produit de la sélection
+  void removeProduct(Product product) {
+    selectedProducts.remove(product);
     update();
+  }
+
+  /// Basculer la sélection d'un produit
+  void toggleProduct(Product product) {
+    if (selectedProducts.contains(product)) {
+      removeProduct(product);
+    } else {
+      addProduct(product);
+    }
+  }
+
+  /// Vérifier si un produit est sélectionné
+  bool isProductSelected(Product product) {
+    return selectedProducts.contains(product);
   }
 
   @override
@@ -86,7 +102,7 @@ class AddSupplierController extends GetxController {
   }
 
   /// Charger les données du fournisseur à modifier
-  void _loadSupplierData() {
+  void _loadSupplierData() async {
     if (supplierToEdit == null) return;
 
     companyController.text = supplierToEdit!.name ?? '';
@@ -104,8 +120,16 @@ class AddSupplierController extends GetxController {
         final productsText = line.replaceFirst('Produits:', '').trim();
         productsController.text = productsText;
         
-        // Charger les produits sélectionnés
-        selectedProducts = productsText.split(',').map((p) => p.trim()).where((p) => p.isNotEmpty).toList();
+        // Charger les produits sélectionnés par nom
+        final productNames = productsText.split(',').map((p) => p.trim()).where((p) => p.isNotEmpty).toList();
+        
+        // Attendre que les produits soient chargés
+        await _loadAvailableProducts();
+        
+        final selectedProductList = availableProducts.where((product) => 
+          productNames.contains(product.name)
+        ).toList();
+        selectedProducts.assignAll(selectedProductList);
       } else if (line.startsWith('Conditions de paiement:')) {
         paymentController.text =
             line.replaceFirst('Conditions de paiement:', '').trim();
@@ -221,7 +245,8 @@ class AddSupplierController extends GetxController {
     final notes = <String>[];
 
     if (selectedProducts.isNotEmpty) {
-      notes.add('Produits: ${selectedProducts.join(', ')}');
+      final productNames = selectedProducts.map((p) => p.name ?? 'Produit sans nom').join(', ');
+      notes.add('Produits: $productNames');
     }
 
     if (paymentController.text.trim().isNotEmpty) {

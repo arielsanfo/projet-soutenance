@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/app/data/storage.dart';
 // import 'package:flutter_application_1/app/routes/app_pages.dart';
 import 'package:flutter_application_1/helpers/app_constante.dart';
 import 'package:get/get.dart';
@@ -178,13 +179,91 @@ class AddSupplierView extends GetView<AddSupplierController> {
             ),
             Container(
               padding: EdgeInsets.all(AppSpacings.l),
-              child: _MultiSelectDropdown(
-                items: controller.availableProducts,
-                selectedItems: controller.selectedProducts,
-                onChanged: (selected) {
-                  controller.selectedProducts.assignAll(selected);
-                  controller.update();
-                },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Select des produits
+                  Obx(() => DropdownButtonFormField<Product>(
+                    value: null,
+                    hint: Text('Sélectionner un produit'),
+                    items: controller.availableProducts.map((product) {
+                      return DropdownMenuItem<Product>(
+                        value: product,
+                        child: Text(
+                          '${product.name ?? 'Produit sans nom'} - ${product.category?.name ?? 'Non catégorisé'}',
+                          style: TextStyle(fontSize: 14),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (Product? selectedProduct) {
+                      if (selectedProduct != null) {
+                        controller.addProduct(selectedProduct);
+                      }
+                    },
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: AppColors.greyLight),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: AppColors.primaryColor),
+                      ),
+                      filled: true,
+                      fillColor: AppColors.backgroundLight,
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: AppSpacings.m,
+                        vertical: AppSpacings.s,
+                      ),
+                    ),
+                  )),
+                  
+                  SizedBox(height: AppSpacings.m),
+                  
+                  // Produits sélectionnés
+                  Obx(() {
+                    if (controller.selectedProducts.isEmpty) {
+                      return Container();
+                    }
+                    
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Produits sélectionnés (${controller.selectedProducts.length})',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary,
+                            fontSize: 14,
+                          ),
+                        ),
+                        SizedBox(height: AppSpacings.s),
+                        Wrap(
+                          spacing: AppSpacings.xs,
+                          runSpacing: AppSpacings.xs,
+                          children: controller.selectedProducts.map((product) {
+                            return Chip(
+                              label: Text(
+                                product.name ?? 'Produit sans nom',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.textOnPrimary,
+                                ),
+                              ),
+                              backgroundColor: AppColors.primaryColor,
+                              deleteIcon: Icon(
+                                Icons.close,
+                                size: 16,
+                                color: AppColors.textOnPrimary,
+                              ),
+                              onDeleted: () => controller.removeProduct(product),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    );
+                  }),
+                ],
               ),
             ),
             if (controller.selectedProducts.isEmpty)
@@ -328,93 +407,6 @@ class AddSupplierView extends GetView<AddSupplierController> {
                 ],
               ),
       ),
-    );
-  }
-}
-
-// Ajout du widget MultiSelectDropdown
-class _MultiSelectDropdown extends StatefulWidget {
-  final List<String> items;
-  final List<String> selectedItems;
-  final ValueChanged<List<String>> onChanged;
-
-  const _MultiSelectDropdown({
-    required this.items,
-    required this.selectedItems,
-    required this.onChanged,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  State<_MultiSelectDropdown> createState() => _MultiSelectDropdownState();
-}
-
-class _MultiSelectDropdownState extends State<_MultiSelectDropdown> {
-  late List<String> _selected;
-
-  @override
-  void initState() {
-    super.initState();
-    _selected = List<String>.from(widget.selectedItems);
-  }
-
-  @override
-  void didUpdateWidget(covariant _MultiSelectDropdown oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.selectedItems != widget.selectedItems) {
-      _selected = List<String>.from(widget.selectedItems);
-    }
-  }
-
-  void _onItemTapped(String item) {
-    setState(() {
-      if (_selected.contains(item)) {
-        _selected.remove(item);
-      } else {
-        _selected.add(item);
-      }
-      widget.onChanged(_selected);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return DropdownButtonFormField<String>(
-      isExpanded: true,
-      value: null,
-      hint: Text(_selected.isEmpty
-          ? 'Sélectionner les produits'
-          : _selected.join(', ')),
-      items: widget.items.map((item) {
-        return DropdownMenuItem<String>(
-          value: item,
-          child: StatefulBuilder(
-            builder: (context, setState) => CheckboxListTile(
-              value: _selected.contains(item),
-              onChanged: (_) => _onItemTapped(item),
-              title: Text(item),
-              controlAffinity: ListTileControlAffinity.leading,
-              contentPadding: EdgeInsets.zero,
-            ),
-          ),
-        );
-      }).toList(),
-      onChanged: (_) {}, // Ne rien faire ici, la sélection se fait dans CheckboxListTile
-      selectedItemBuilder: (context) => widget.items.map((item) => Text('')).toList(),
-      icon: Icon(Icons.arrow_drop_down),
-      decoration: InputDecoration(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        filled: true,
-        fillColor: AppColors.backgroundWhite,
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: AppSpacings.l,
-          vertical: AppSpacings.m,
-        ),
-      ),
-      dropdownColor: AppColors.backgroundWhite,
     );
   }
 }

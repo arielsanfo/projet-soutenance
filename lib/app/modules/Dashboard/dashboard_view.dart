@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/app/routes/app_pages.dart';
 import 'package:flutter_application_1/helpers/app_constante.dart';
+// import 'package:flutter_application_1/app/modules/Login/login_controller.dart';
+import 'package:flutter_application_1/app/data/controller/userServices.dart';
 
 import 'package:get/get.dart';
 
@@ -16,61 +18,47 @@ class DashboardView extends GetView<DashboardController> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout, color: AppColors.tagRedText),
-            tooltip: 'Déconnexion',
-            onPressed: () async {
-              final confirm = await showDialog<bool>(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  title: Row(
-                    children: [
-                      Icon(Icons.logout, color: AppColors.tagRedText),
-                      SizedBox(width: 12),
-                      Expanded(child: Text('Déconnexion')),
-                    ],
-                  ),
-                  content: Text('Voulez-vous vraiment vous déconnecter ?', textAlign: TextAlign.center),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(ctx, false),
-                      child: Text('Annuler'),
-                    ),
-                    ElevatedButton.icon(
-                      icon: Icon(Icons.logout),
-                      onPressed: () => Navigator.pop(ctx, true),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.tagRedText,
-                        foregroundColor: AppColors.textOnPrimary,
-                      ),
-                      label: Text('Se déconnecter'),
-                    ),
-                  ],
+        title: FutureBuilder<String?>(
+          future: SessionManager.getUserName(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData && snapshot.data != null) {
+              return Text(
+                'Bonjour, ${snapshot.data}',
+                style: AppTypography.titleMedium.copyWith(
+                  color: AppColors.primaryColor,
+                  fontWeight: FontWeight.w600,
                 ),
               );
-              if (confirm == true) {
-                Get.offAllNamed(Routes.LOGIN);
-                Future.delayed(Duration(milliseconds: 400), () {
-                  Get.snackbar(
-                    'Déconnexion',
-                    'Déconnexion réussie !',
-                    backgroundColor: AppColors.successColor,
-                    colorText: AppColors.textOnPrimary,
-                    snackPosition: SnackPosition.TOP,
-                  );
-                });
-              }
+            }
+            return Text(
+              'Dashboard',
+              style: AppTypography.titleMedium.copyWith(
+                color: AppColors.primaryColor,
+                fontWeight: FontWeight.w600,
+              ),
+            );
+          },
+        ),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: Icon(Icons.menu, color: AppColors.primaryColor),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
             },
           ),
-        ],
+        ),
+      
       ),
+      drawer: _buildUserDrawer(context),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(AppSpacings.l),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Carte d'informations utilisateur
+            _buildUserInfoCard(),
+            SizedBox(height: AppSpacings.l),
+            
             // Carte des ventes du jour
             _buildSalesCard(),
             SizedBox(height: AppSpacings.xl),
@@ -88,6 +76,346 @@ class DashboardView extends GetView<DashboardController> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildUserDrawer(BuildContext context) {
+    return Drawer(
+      child: FutureBuilder<Map<String, dynamic>?>(
+        future: SessionManager.getSessionInfo(),
+        builder: (context, snapshot) {
+          final sessionInfo = snapshot.data;
+          final userName = sessionInfo?['user_name'] ?? 'Utilisateur';
+          final userEmail = sessionInfo?['user_email'] ?? '';
+          final userRole = sessionInfo?['user_role'] ?? 'Utilisateur';
+          
+          // Générer les initiales pour l'avatar
+          final initials = userName.isNotEmpty
+              ? userName.trim().split(' ').map((e) => e.isNotEmpty ? e[0] : '').take(2).join().toUpperCase()
+              : 'U';
+          
+          return Column(
+            children: [
+              // Header du drawer avec informations utilisateur
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).padding.top + AppSpacings.l,
+                  bottom: AppSpacings.l,
+                  left: AppSpacings.l,
+                  right: AppSpacings.l,
+                ),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppColors.primaryColor,
+                      AppColors.primaryColor.withOpacity(0.8),
+                    ],
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    // CircleAvatar cliquable pour aller au profil
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context); // Fermer le drawer
+                        _navigateToProfile();
+                      },
+                      child: Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: AppColors.textOnPrimary,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColors.textOnPrimary,
+                            width: 3,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            initials,
+                            style: AppTypography.titleLarge.copyWith(
+                              color: AppColors.primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: AppSpacings.m),
+                    Text(
+                      userName,
+                      style: AppTypography.titleMedium.copyWith(
+                        color: AppColors.textOnPrimary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: AppSpacings.s),
+                    Text(
+                      userEmail,
+                      style: AppTypography.bodyMedium.copyWith(
+                        color: AppColors.textOnPrimary.withOpacity(0.9),
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: AppSpacings.s),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.textOnPrimary.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        userRole,
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.textOnPrimary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Menu du drawer
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: [
+                    _buildDrawerItem(
+                      icon: Icons.dashboard,
+                      title: 'Dashboard',
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    _buildDrawerItem(
+                      icon: Icons.person,
+                      title: 'Mon Profil',
+                      onTap: () {
+                        Navigator.pop(context);
+                        _navigateToProfile();
+                      },
+                    ),
+                    _buildDrawerItem(
+                      icon: Icons.settings,
+                      title: 'Paramètres',
+                      onTap: () {
+                        Navigator.pop(context);
+                        Get.toNamed(Routes.SETTINGS);
+                      },
+                    ),
+                    Divider(color: AppColors.greyLight),
+                    _buildDrawerItem(
+                      icon: Icons.shopping_cart,
+                      title: 'Ventes',
+                      onTap: () {
+                        Navigator.pop(context);
+                        Get.toNamed(Routes.NEWSALE);
+                      },
+                    ),
+                    _buildDrawerItem(
+                      icon: Icons.people,
+                      title: 'Clients',
+                      onTap: () {
+                        Navigator.pop(context);
+                        Get.toNamed(Routes.CLIENT_LIST);
+                      },
+                    ),
+                    _buildDrawerItem(
+                      icon: Icons.inventory,
+                      title: 'Produits',
+                      onTap: () {
+                        Navigator.pop(context);
+                        Get.toNamed(Routes.PRODUCT_LIST);
+                      },
+                    ),
+                    _buildDrawerItem(
+                      icon: Icons.local_shipping,
+                      title: 'Fournisseurs',
+                      onTap: () {
+                        Navigator.pop(context);
+                        Get.toNamed(Routes.SUPPLIER_LIST);
+                      },
+                    ),
+                    Divider(color: AppColors.greyLight),
+                    _buildDrawerItem(
+                      icon: Icons.logout,
+                      title: 'Se déconnecter',
+                      onTap: () async {
+                        Navigator.pop(context);
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            title: Row(
+                              children: [
+                                Icon(Icons.logout, color: AppColors.tagRedText),
+                                SizedBox(width: 12),
+                                Expanded(child: Text('Déconnexion')),
+                              ],
+                            ),
+                            content: Text('Voulez-vous vraiment vous déconnecter ?', textAlign: TextAlign.center),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(ctx, false),
+                                child: Text('Annuler'),
+                              ),
+                              ElevatedButton.icon(
+                                icon: Icon(Icons.logout),
+                                onPressed: () => Navigator.pop(ctx, true),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.tagRedText,
+                                  foregroundColor: AppColors.textOnPrimary,
+                                ),
+                                label: Text('Se déconnecter'),
+                              ),
+                            ],
+                          ),
+                        );
+                        if (confirm == true) {
+                          await SessionManager.clearSession();
+                          SessionNotificationService.notifyLogout();
+                          Get.offAllNamed(Routes.LOGIN);
+                        }
+                      },
+                      textColor: AppColors.tagRedText,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildDrawerItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    Color? textColor,
+  }) {
+    return ListTile(
+      leading: Icon(
+        icon,
+        color: textColor ?? AppColors.primaryColor,
+        size: 24,
+      ),
+      title: Text(
+        title,
+        style: AppTypography.bodyMedium.copyWith(
+          color: textColor ?? AppColors.textPrimary,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      onTap: onTap,
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: AppSpacings.l,
+        vertical: AppSpacings.s,
+      ),
+    );
+  }
+
+  void _navigateToProfile() async {
+    final currentUser = await SessionManager.getCurrentUser();
+    if (currentUser != null) {
+      Get.toNamed(Routes.PROFILE, arguments: currentUser);
+    } else {
+      Get.snackbar(
+        'Erreur',
+        'Impossible de récupérer les informations du profil',
+        backgroundColor: AppColors.tagRedText,
+        colorText: AppColors.textOnPrimary,
+      );
+    }
+  }
+
+  Widget _buildUserInfoCard() {
+    return FutureBuilder<Map<String, dynamic>?>(
+      future: SessionManager.getSessionInfo(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData && snapshot.data != null) {
+          final sessionInfo = snapshot.data!;
+          return Container(
+            padding: EdgeInsets.all(AppSpacings.l),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppColors.primaryColor.withOpacity(0.1),
+                  AppColors.accentColor.withOpacity(0.1),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: AppColors.primaryColor.withOpacity(0.2),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(AppSpacings.m),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryColor,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.person,
+                    color: AppColors.textOnPrimary,
+                    size: 24,
+                  ),
+                ),
+                SizedBox(width: AppSpacings.m),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        sessionInfo['user_name'] ?? 'Utilisateur',
+                        style: AppTypography.titleMedium.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryColor,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        sessionInfo['user_email'] ?? '',
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.greyMedium,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          'Rôle: ${sessionInfo['user_role'] ?? 'Utilisateur'}',
+                          style: AppTypography.bodySmall.copyWith(
+                            color: AppColors.primaryColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+        return SizedBox.shrink();
+      },
     );
   }
 
@@ -226,7 +554,7 @@ class DashboardView extends GetView<DashboardController> {
         'color': AppColors.primaryColor,
         'label': 'Commande',
         'onTap': () {
-          Get.toNamed(Routes.ADD_ORDER);
+          Get.toNamed(Routes.MANAGEMENT_ORDER);
         },
       },
       {
@@ -282,7 +610,7 @@ class DashboardView extends GetView<DashboardController> {
         'label': 'Dettes',
         'color': Colors.red.shade500,
         'onTap': () {
-          Get.toNamed(Routes.MANAGEMENT_ORDER);
+          Get.toNamed(Routes.DETTES);
         },
       },
       {
