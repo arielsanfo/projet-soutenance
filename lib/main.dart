@@ -25,7 +25,7 @@ Future<void> main() async {
       SaleItemSchema,
       OrderSchema,
       OrderItemSchema,
-      SupplierSchema,   
+      SupplierSchema,
       SupplierOrderSchema,
       SupplierOrderItemSchema,
       InventoryMovementSchema,
@@ -40,7 +40,7 @@ Future<void> main() async {
 
   // Initialiser le gestionnaire de session global
   SessionManager.init();
-  
+
   // Debug: Vérifier l'état de la session au démarrage
   final isLoggedIn = await SessionManager.isLoggedIn();
   print('=== DÉMARRAGE APP ===');
@@ -49,7 +49,7 @@ Future<void> main() async {
     final user = await SessionManager.getCurrentUser();
     print('Utilisateur connecté: ${user?.name} (${user?.email})');
   }
-  
+
   // Créer un utilisateur par défaut si aucun utilisateur n'existe
   await _createDefaultUserIfNeeded();
 
@@ -61,24 +61,27 @@ Future<void> _createDefaultUserIfNeeded() async {
   try {
     final isar = Get.find<Isar>();
     final userService = UserService(isar);
-    
+
     // Vérifier s'il y a des utilisateurs dans la base
     final users = await userService.getAllUsers();
     print('Nombre d\'utilisateurs dans la base: ${users.length}');
-    
+
     if (users.isEmpty) {
-      print('Aucun utilisateur trouvé, création d\'un utilisateur par défaut...');
-      
+      print(
+          'Aucun utilisateur trouvé, création d\'un utilisateur par défaut...');
+
       // Créer un utilisateur admin par défaut
       final defaultUser = User(
         name: 'Admin',
         email: 'admin@commercepro.com',
-        passwordHash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', // 'admin'
+        passwordHash:
+            '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', // 'admin'
         role: UserRoleIsar.admin,
       );
-      
+
       await userService.saveUser(defaultUser);
-      print('Utilisateur par défaut créé: ${defaultUser.name} (${defaultUser.email})');
+      print(
+          'Utilisateur par défaut créé: ${defaultUser.name} (${defaultUser.email})');
       print('Mot de passe par défaut: admin');
     }
   } catch (e) {
@@ -92,7 +95,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: "CommercePro",
+      title: "AlbaStore",
       initialRoute: '/splash',
       debugShowCheckedModeBanner: false,
       getPages: [
@@ -127,7 +130,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
   bool _isNavigating = false;
@@ -139,7 +143,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       vsync: this,
       duration: Duration(milliseconds: 1200),
     );
-    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOutBack);
+    _animation =
+        CurvedAnimation(parent: _controller, curve: Curves.easeOutBack);
     _controller.forward();
     _navigate();
   }
@@ -147,19 +152,19 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   Future<void> _navigate() async {
     if (_isNavigating) return;
     _isNavigating = true;
-    
+
     print('=== SPLASH SCREEN ===');
     print('Début de la navigation...');
-    
+
     // Attendre l'animation du splash
     await Future.delayed(Duration(seconds: 3));
-    
+
     if (mounted) {
       try {
         // Vérifier la session directement
         final isLoggedIn = await SessionManager.isLoggedIn();
         print('Vérification session dans splash: $isLoggedIn');
-        
+
         String initialRoute;
         if (isLoggedIn) {
           initialRoute = '/dashboard';
@@ -168,7 +173,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           initialRoute = '/login';
           print('Aucune session, redirection vers login');
         }
-        
+
         // Navigation avec transition fluide
         Get.offAllNamed(initialRoute);
       } catch (e) {
@@ -208,15 +213,16 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     ),
                   ],
                 ),
-                child: Icon(
-                  AppIcons.store,
-                  size: 90,
-                  color: AppColors.primaryColor,
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  width: 50,
+                  height: 50,
+                  fit: BoxFit.cover,
                 ),
               ),
               SizedBox(height: 32),
               Text(
-                'CommercePro',
+                'AlbaStore',
                 style: AppTypography.displayLarge.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,

@@ -426,7 +426,7 @@ class AppDurations {
 //----------------------------------------------------------------------------//
 
 class AppConstants {
-  static const String appName = 'CommercePro';
+  static const String appName = 'AlbaStore';
   static const String appVersion =
       '1.0.0'; // Gérer via build runner si possible
   static const int itemsPerPage = 20; // Pour la pagination des listes

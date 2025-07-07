@@ -53,15 +53,16 @@ class LoginView extends GetView<LoginController> {
                           ),
                         ],
                       ),
-                      child: Icon(
-                        AppIcons.store,
-                        size: 40,
-                        color: AppColors.primaryColor,
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
                       ),
                     ),
                     SizedBox(height: AppSpacings.xxl),
                     Text(
-                      'CommercePro',
+                      'AlbaStore',
                       style: AppTypography.titleLarge.copyWith(
                         color: AppColors.textOnPrimary,
                         fontWeight: FontWeight.bold,

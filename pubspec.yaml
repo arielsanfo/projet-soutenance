@@ -47,6 +47,8 @@ dependencies:
   fl_chart: ^0.66.0
   uuid: ^4.5.1
   csv: ^5.0.0
+  flutter_native_splash: ^2.4.0
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies:
   flutter_test:
@@ -102,6 +104,19 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+  # command: dart run flutter_native_splash:create
+flutter_native_splash:
+  image: assets/images/logo.png
+  color: "#FFFFFF"
+  android: true
+  ios: true
+
+# command: dart run flutter_launcher_icons:main
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logo.png"
 
 get_cli:
   sub_folder: false

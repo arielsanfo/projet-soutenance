@@ -11,7 +11,7 @@ class HomeView extends GetView<HomeController> {
   
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'CommercePro',
+      title: 'AlbaStore',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,

@@ -53,10 +53,11 @@ class SignUpView extends GetView<SignUpController> {
                           ),
                         ],
                       ),
-                      child: Icon(
-                        AppIcons.store,
-                        size: 50,
-                        color: AppColors.primaryColor,
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
                       ),
                     ),
                     SizedBox(height: AppSpacings.l),
@@ -178,9 +179,9 @@ class SignUpView extends GetView<SignUpController> {
                           ],
                         ),
                         child: GetBuilder<SignUpController>(
-                        builder: (_) => Row(
+                          builder: (_) => Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
+                            children: [
                               Container(
                                 decoration: BoxDecoration(
                                   color: controller.termsAccepted
@@ -189,11 +190,11 @@ class SignUpView extends GetView<SignUpController> {
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Checkbox(
-                              value: controller.termsAccepted,
-                              onChanged: (bool? value) {
-                                controller.termsAccepted = value ?? false;
-                                controller.update();
-                              },
+                                  value: controller.termsAccepted,
+                                  onChanged: (bool? value) {
+                                    controller.termsAccepted = value ?? false;
+                                    controller.update();
+                                  },
                                   activeColor: AppColors.primaryColor,
                                   checkColor: AppColors.textOnPrimary,
                                 ),
@@ -210,7 +211,7 @@ class SignUpView extends GetView<SignUpController> {
                                       TextSpan(
                                         text: 'Termes et Conditions',
                                         style: TextStyle(
-                                color: AppColors.primaryColor,
+                                          color: AppColors.primaryColor,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
@@ -345,7 +346,8 @@ class SignUpView extends GetView<SignUpController> {
     );
   }
 
-  Widget _buildRoleOption(UserRoleIsar role, String title, String description, IconData icon) {
+  Widget _buildRoleOption(
+      UserRoleIsar role, String title, String description, IconData icon) {
     return GetBuilder<SignUpController>(
       builder: (controller) => InkWell(
         onTap: () => controller.setSelectedRole(role),
@@ -353,12 +355,12 @@ class SignUpView extends GetView<SignUpController> {
         child: Container(
           padding: EdgeInsets.all(AppSpacings.m),
           decoration: BoxDecoration(
-            color: controller.selectedRole == role 
+            color: controller.selectedRole == role
                 ? AppColors.primaryColor.withOpacity(0.1)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: controller.selectedRole == role 
+              color: controller.selectedRole == role
                   ? AppColors.primaryColor
                   : AppColors.greyLight,
               width: 2,
@@ -369,14 +371,14 @@ class SignUpView extends GetView<SignUpController> {
               Container(
                 padding: EdgeInsets.all(AppSpacings.s),
                 decoration: BoxDecoration(
-                  color: controller.selectedRole == role 
+                  color: controller.selectedRole == role
                       ? AppColors.primaryColor
                       : AppColors.greyLight,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Icon(
                   icon,
-                  color: controller.selectedRole == role 
+                  color: controller.selectedRole == role
                       ? AppColors.textOnPrimary
                       : AppColors.textSecondary,
                   size: 20,
@@ -390,7 +392,7 @@ class SignUpView extends GetView<SignUpController> {
                     Text(
                       title,
                       style: AppTypography.titleMedium.copyWith(
-                        color: controller.selectedRole == role 
+                        color: controller.selectedRole == role
                             ? AppColors.primaryColor
                             : AppColors.textPrimary,
                         fontWeight: FontWeight.w600,
@@ -411,7 +413,7 @@ class SignUpView extends GetView<SignUpController> {
                   Icons.check_circle,
                   color: AppColors.primaryColor,
                   size: 24,
-              ),
+                ),
             ],
           ),
         ),
